@@ -223,6 +223,11 @@ export interface SiteContent {
     guestbookTag: string;
   };
   typography: {
+    heroSize: number;
+    displaySize: number;
+    headingSize: number;
+    bodySize: number;
+    helperSize: number;
     displayWeight: number;
     headingWeight: number;
     bodyWeight: number;
@@ -319,11 +324,16 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     guestbookTag: '#四金的时光小屋',
   },
   typography: {
-    displayWeight: 900,
-    headingWeight: 800,
-    bodyWeight: 500,
-    helperWeight: 700,
-    mobileAutoLighten: true,
+    heroSize: 72,
+    displaySize: 42,
+    headingSize: 22,
+    bodySize: 16,
+    helperSize: 13,
+    displayWeight: 700,
+    headingWeight: 600,
+    bodyWeight: 400,
+    helperWeight: 500,
+    mobileAutoLighten: false,
   },
   footer: {
     heading: "Let's build something\nextraordinary together.",
