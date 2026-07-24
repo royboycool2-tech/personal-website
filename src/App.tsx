@@ -523,7 +523,7 @@ export default function App() {
 
         {/* ----------------- TAB 1: HOME (首页) ----------------- */}
         {activeTab === 'home' && (
-          <div id="home_tab_view" className="space-y-12 animate-fadeIn">
+          <div id="home_tab_view" data-site-page="home" className="site-page site-page-home space-y-12 animate-fadeIn">
             {/* Display Big Bold Heading - Hey,buddy! */}
             <div className="relative text-center py-4">
               <h1 className="site-hero-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
@@ -715,7 +715,7 @@ export default function App() {
 
         {/* ----------------- TAB 2: ABOUT ME (关于我) ----------------- */}
         {activeTab === 'about' && (
-          <div id="about_tab_view" className="space-y-16 animate-fadeIn">
+          <div id="about_tab_view" data-site-page="about" className="site-page site-page-about space-y-16 animate-fadeIn">
             
             {/* Section A: Basic Introduction */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
@@ -887,7 +887,7 @@ export default function App() {
 
         {/* ----------------- TAB 3: WORKS (我的作品) ----------------- */}
         {activeTab === 'works' && (
-          <div id="works_tab_view" className="space-y-12 animate-fadeIn">
+          <div id="works_tab_view" data-site-page="works" className="site-page site-page-works space-y-12 animate-fadeIn">
             
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-4 border-dashed border-[#4A3E26] pb-6">
               <div>
@@ -1258,7 +1258,7 @@ export default function App() {
 
         {/* ----------------- TAB 4: LIFE FRAGMENTS (生活碎片) ----------------- */}
         {activeTab === 'life' && (
-          <div id="life_tab_view" className="space-y-16 animate-fadeIn">
+          <div id="life_tab_view" data-site-page="life" className="site-page site-page-life space-y-16 animate-fadeIn">
             
             {/* Section A: Life Fragments Intro */}
             <div className="space-y-6">
@@ -1864,7 +1864,7 @@ export default function App() {
       </main>
 
       {/* FOOTER BAR (Warm yellow styling matching screens) */}
-      <footer className="mt-auto border-t-4 border-[#4A3E26] bg-[#F3C556] py-10 px-4 sm:px-8 text-[#4A3E26] shadow-[inset_0_4px_0_0_rgba(0,0,0,0.05)]">
+      <footer data-site-page="footer" className="site-page site-page-footer mt-auto border-t-4 border-[#4A3E26] bg-[#F3C556] py-10 px-4 sm:px-8 text-[#4A3E26] shadow-[inset_0_4px_0_0_rgba(0,0,0,0.05)]">
         <div className="max-w-4xl mx-auto">
           {/* Main content: left title + right nav */}
           <div className="flex flex-col sm:flex-row justify-between gap-8 pb-8">
