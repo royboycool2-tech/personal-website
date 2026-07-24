@@ -230,6 +230,17 @@ export default function App() {
   const [selectedColor, setSelectedColor] = useState('#FFF9BB'); // default yellow
   const [selectedEmoji, setSelectedEmoji] = useState('✨');
   const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+  const [guestbookPage, setGuestbookPage] = useState(1);
+  const guestbookPageSize = 6;
+  const guestbookPageCount = Math.max(1, Math.ceil(notes.length / guestbookPageSize));
+  const visibleGuestbookNotes = notes.slice(
+    (guestbookPage - 1) * guestbookPageSize,
+    guestbookPage * guestbookPageSize
+  );
+
+  useEffect(() => {
+    setGuestbookPage((currentPage) => Math.min(currentPage, guestbookPageCount));
+  }, [guestbookPageCount]);
 
   // Life Fragment States
   const [showPostForm, setShowPostForm] = useState(false);
@@ -387,6 +398,7 @@ export default function App() {
     setNewNickname('');
     setSelectedColor('#FFF9BB');
     setSelectedEmoji('✨');
+    setGuestbookPage(1);
     setIsSubmitSuccess(true);
     setTimeout(() => setIsSubmitSuccess(false), 3000);
 
@@ -542,16 +554,15 @@ export default function App() {
         {activeTab === 'home' && (
           <div id="home_tab_view" data-site-page="home" className="site-page site-page-home space-y-4 animate-fadeIn">
             {/* Display Big Bold Heading - Hey,buddy! */}
-            <div className="relative text-center pt-1 pb-0">
+            <div className="text-center pt-1 pb-0">
               <h1 className="site-hero-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
                 {siteContent.home.heroTitle}
+                <span className="inline-flex align-top ml-1 sm:ml-2 animate-float" aria-hidden="true">
+                  <span className="relative w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-[#3BB4FE] border-2 sm:border-4 border-[#4A3E26] flex items-center justify-center shadow-[2px_2px_0_0_#4A3E26]" style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}>
+                    <span className="text-white font-handwriting text-[8px] sm:text-[10px] font-bold rotate-12">✨</span>
+                  </span>
+                </span>
               </h1>
-              {/* Spiky Blue badge overlay */}
-              <div className="absolute right-4 md:right-16 top-0 transform translate-y-12 animate-float">
-                <div className="relative w-16 h-16 bg-[#3BB4FE] border-4 border-[#4A3E26] flex items-center justify-center shadow-[3px_3px_0_0_#4A3E26]" style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}>
-                  <span className="text-white font-handwriting text-xs font-bold rotate-12">✨</span>
-                </div>
-              </div>
             </div>
 
             {/* Visual Bento Arrangement (Screenshot 1 setup) */}
@@ -1831,10 +1842,10 @@ export default function App() {
 
                   {/* Notes mapping container */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10 p-2">
-                    {notes.map((note) => (
+                    {visibleGuestbookNotes.map((note) => (
                       <div 
                         key={note.id}
-                        className="p-5 border-4 border-[#4A3E26] rounded-2xl shadow-[4px_4px_0_0_#4A3E26] relative transition-transform duration-300"
+                        className="p-5 min-h-[180px] border-4 border-[#4A3E26] rounded-2xl shadow-[4px_4px_0_0_#4A3E26] relative transition-transform duration-300"
                         style={{ 
                           backgroundColor: note.color, 
                           transform: `rotate(${note.rotation}deg)` 
@@ -1852,7 +1863,7 @@ export default function App() {
                           <p className="text-xs font-handwriting font-black text-[#8E6D3B] border-b border-[#4A3E26]/25 pb-1">
                             From: <span className="text-sm font-display text-[#4A3E26] font-black">{note.nickname}</span>
                           </p>
-                          <p className="text-xs md:text-sm text-[#4A3E26] leading-relaxed font-medium font-display text-justify">
+                          <p className="guestbook-note-content text-xs md:text-sm text-[#4A3E26] leading-relaxed font-medium font-display text-justify" title={note.content}>
                             {note.content}
                           </p>
                           <div className="flex justify-between items-center text-[9px] text-[#8E6D3B]/70 pt-1 font-mono">
@@ -1868,6 +1879,30 @@ export default function App() {
                     <div className="h-full flex items-center justify-center p-8 text-center text-white/80 font-black">
                       还没人在留言软木板上钉过纸条呢，写下你的第一个留言吧！💬
                     </div>
+                  )}
+
+                  {notes.length > guestbookPageSize && (
+                    <nav className="relative z-10 mt-6 mx-2 flex flex-wrap items-center justify-center gap-3 rounded-2xl border-2 border-[#4A3E26] bg-[#FFF9BB]/95 px-4 py-3 shadow-[3px_3px_0_0_#4A3E26]" aria-label="留言分页">
+                      <button
+                        type="button"
+                        onClick={() => setGuestbookPage((page) => Math.max(1, page - 1))}
+                        disabled={guestbookPage === 1}
+                        className="rounded-full border-2 border-[#4A3E26] bg-white px-4 py-1.5 text-sm font-bold text-[#4A3E26] transition-all enabled:hover:bg-[#3BB4FE] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ← 上一页
+                      </button>
+                      <span className="min-w-28 text-center text-sm font-bold text-[#8E6D3B]">
+                        {guestbookPage} / {guestbookPageCount} 页 · 共 {notes.length} 条
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setGuestbookPage((page) => Math.min(guestbookPageCount, page + 1))}
+                        disabled={guestbookPage === guestbookPageCount}
+                        className="rounded-full border-2 border-[#4A3E26] bg-white px-4 py-1.5 text-sm font-bold text-[#4A3E26] transition-all enabled:hover:bg-[#3BB4FE] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        下一页 →
+                      </button>
+                    </nav>
                   )}
 
                 </div>

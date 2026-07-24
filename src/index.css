@@ -299,3 +299,9 @@
     font-weight: calc(var(--site-mobile-heading-weight, 600) - 100) !important;
   }
 }
+.guestbook-note-content {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
