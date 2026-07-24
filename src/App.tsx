@@ -250,6 +250,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'photo' | 'diary' | 'moment'>('all');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [viewMonthFilter, setViewMonthFilter] = useState(false);
+  const [lifePage, setLifePage] = useState(1);
 
   useEffect(() => {
     if (selectedWork || selectedFragment) {
@@ -372,6 +373,31 @@ export default function App() {
     
     return result;
   })();
+
+  const lifePageSize = 9;
+  const lifePageCount = Math.max(1, Math.ceil(filteredFragments.length / lifePageSize));
+  const visibleFragments = filteredFragments.slice(
+    (lifePage - 1) * lifePageSize,
+    lifePage * lifePageSize
+  );
+
+  useEffect(() => {
+    setLifePage(1);
+  }, [selectedCategory, sortOrder, viewMonthFilter]);
+
+  useEffect(() => {
+    setLifePage((currentPage) => Math.min(currentPage, lifePageCount));
+  }, [lifePageCount]);
+
+  const goToLifePage = (page: number) => {
+    setLifePage(Math.min(lifePageCount, Math.max(1, page)));
+    window.requestAnimationFrame(() => {
+      document.getElementById('life-gallery-grid')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  };
 
   // Handle Sticky Note Submission
   const handleAddNote = async (e: React.FormEvent) => {
@@ -1520,7 +1546,7 @@ export default function App() {
               </div>
 
               {/* Masonry-like layout */}
-              <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+              <div id="life-gallery-grid" className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 scroll-mt-24">
                 {isLoadingFragments ? (
                   <div className="col-span-full text-center py-16">
                     <div className="animate-spin w-10 h-10 border-4 border-[#3BB4FE] border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -1541,7 +1567,7 @@ export default function App() {
                     <p className="text-sm text-[#8E6D3B] font-bold">四金的生活图鉴正在加载中...</p>
                   </div>
                 ) : (
-                  filteredFragments.map((fragment, index) => (
+                  visibleFragments.map((fragment, index) => (
                   <div 
                     key={fragment.id}
                     onClick={() => setSelectedFragment(fragment)}
@@ -1622,6 +1648,30 @@ export default function App() {
                   ))
                 )}
               </div>
+
+              {filteredFragments.length > lifePageSize && (
+                <nav className="mt-8 flex flex-wrap items-center justify-center gap-3 rounded-2xl border-2 border-[#4A3E26] bg-[#FFFDE5] px-4 py-3 shadow-[3px_3px_0_0_#4A3E26]" aria-label="生活图鉴分页">
+                  <button
+                    type="button"
+                    onClick={() => goToLifePage(lifePage - 1)}
+                    disabled={lifePage === 1}
+                    className="rounded-full border-2 border-[#4A3E26] bg-white px-4 py-1.5 text-sm font-bold text-[#4A3E26] transition-all enabled:hover:bg-[#3BB4FE] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    ← 上一页
+                  </button>
+                  <span className="min-w-36 text-center text-sm font-bold text-[#8E6D3B]">
+                    第 {lifePage} / {lifePageCount} 页 · 共 {filteredFragments.length} 条
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => goToLifePage(lifePage + 1)}
+                    disabled={lifePage === lifePageCount}
+                    className="rounded-full border-2 border-[#4A3E26] bg-white px-4 py-1.5 text-sm font-bold text-[#4A3E26] transition-all enabled:hover:bg-[#3BB4FE] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    下一页 →
+                  </button>
+                </nav>
+              )}
             </div>
 
             {/* Fragment Detail Modal */}
