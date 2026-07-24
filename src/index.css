@@ -72,10 +72,6 @@
   animation: bounce-dot 1.2s ease-in-out infinite;
 }
 
-.mobile-safe-nav {
-  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-}
-
 /*
  * Frontend typography controls.
  * Values are supplied by the public site-content API and are scoped to the
