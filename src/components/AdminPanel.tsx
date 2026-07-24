@@ -169,6 +169,33 @@ function WeightSelect({ label, value, onChange }: WeightSelectProps) {
   );
 }
 
+interface SizeSelectProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}
+
+function SizeSelect({ label, value, min, max, onChange }: SizeSelectProps) {
+  const allSizes = [11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 104, 112, 120];
+  const options = allSizes.filter(size => size >= min && size <= max);
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]"
+      >
+        {options.map(size => (
+          <option key={size} value={size}>{size}px</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'content' | 'fragments' | 'guestbook' | 'works' | 'about'>(() => {
     const saved = localStorage.getItem('adminActiveTab');
@@ -1374,7 +1401,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
                       <h3 className="text-2xl font-black text-[#3BB4FE]">05 · 全局文字样式</h3>
-                      <p className="text-xs font-bold text-[#8E6D3B] mt-1">一次调整全站字重；数字越大，文字越粗。</p>
+                      <p className="text-xs font-bold text-[#8E6D3B] mt-1">字号和粗细完全独立，可分别选择后统一保存。</p>
                     </div>
                     <button
                       type="button"
@@ -1389,11 +1416,30 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       恢复推荐值
                     </button>
                   </div>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-black text-[#4A3E26]">字号大小（px）</h4>
+                      <p className="text-xs font-bold text-[#8E6D3B] mt-1">数值越大，文字占用空间越大；不会改变文字粗细。</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                      <SizeSelect label="首页 Hey,buddy 大标题字号" value={siteContent.typography.heroSize} min={32} max={120} onChange={value => updateContentField('typography', 'heroSize', value)} />
+                      <SizeSelect label="页面大标题字号" value={siteContent.typography.displaySize} min={24} max={72} onChange={value => updateContentField('typography', 'displaySize', value)} />
+                      <SizeSelect label="普通标题 / 卡片标题字号" value={siteContent.typography.headingSize} min={16} max={40} onChange={value => updateContentField('typography', 'headingSize', value)} />
+                      <SizeSelect label="正文字号" value={siteContent.typography.bodySize} min={14} max={24} onChange={value => updateContentField('typography', 'bodySize', value)} />
+                      <SizeSelect label="副标题 / 辅助文字字号" value={siteContent.typography.helperSize} min={11} max={20} onChange={value => updateContentField('typography', 'helperSize', value)} />
+                    </div>
+                  </div>
+                  <div className="space-y-3 pt-5 border-t-2 border-dashed border-[#4A3E26]/20">
+                    <div>
+                      <h4 className="font-black text-[#4A3E26]">字体粗细（字重）</h4>
+                      <p className="text-xs font-bold text-[#8E6D3B] mt-1">保留原来的 300–900 列表；不会改变字号大小。</p>
+                    </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <WeightSelect label="大标题粗细" value={siteContent.typography.displayWeight} onChange={value => updateContentField('typography', 'displayWeight', value)} />
                     <WeightSelect label="普通标题 / 卡片标题粗细" value={siteContent.typography.headingWeight} onChange={value => updateContentField('typography', 'headingWeight', value)} />
                     <WeightSelect label="正文粗细" value={siteContent.typography.bodyWeight} onChange={value => updateContentField('typography', 'bodyWeight', value)} />
                     <WeightSelect label="副标题 / 辅助文字粗细" value={siteContent.typography.helperWeight} onChange={value => updateContentField('typography', 'helperWeight', value)} />
+                  </div>
                   </div>
                   <label className="flex items-center justify-between gap-4 bg-white border-2 border-[#4A3E26] rounded-2xl px-4 py-3 cursor-pointer">
                     <div>
@@ -1409,10 +1455,11 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </label>
                   <div className="bg-white border-2 border-dashed border-[#4A3E26]/40 rounded-2xl p-5 space-y-3">
                     <p className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">当前效果预览</p>
-                    <p className="text-4xl text-[#3BB4FE]" style={{ fontWeight: siteContent.typography.displayWeight }}>这是大标题 Display</p>
-                    <p className="text-xl text-[#4A3E26]" style={{ fontWeight: siteContent.typography.headingWeight }}>这是普通标题和卡片标题</p>
-                    <p className="text-sm text-[#4A3E26]" style={{ fontWeight: siteContent.typography.bodyWeight }}>这是正文内容，用来阅读较长的个人介绍和项目说明。</p>
-                    <p className="text-xs text-[#8E6D3B]" style={{ fontWeight: siteContent.typography.helperWeight }}>这是副标题、标签和辅助说明文字。</p>
+                    <p className="text-[#3BB4FE] leading-none break-words" style={{ fontSize: siteContent.typography.heroSize, fontWeight: siteContent.typography.displayWeight }}>Hey,buddy!</p>
+                    <p className="text-[#3BB4FE] leading-tight break-words" style={{ fontSize: siteContent.typography.displaySize, fontWeight: siteContent.typography.displayWeight }}>这是页面大标题</p>
+                    <p className="text-[#4A3E26] leading-snug" style={{ fontSize: siteContent.typography.headingSize, fontWeight: siteContent.typography.headingWeight }}>这是普通标题和卡片标题</p>
+                    <p className="text-[#4A3E26] leading-relaxed" style={{ fontSize: siteContent.typography.bodySize, fontWeight: siteContent.typography.bodyWeight }}>这是正文内容，用来阅读较长的个人介绍和项目说明。</p>
+                    <p className="text-[#8E6D3B] leading-normal" style={{ fontSize: siteContent.typography.helperSize, fontWeight: siteContent.typography.helperWeight }}>这是副标题、标签和辅助说明文字。</p>
                   </div>
                 </section>
 
