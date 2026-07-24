@@ -681,7 +681,11 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
     return;
   }
 
-  if (method === 'GET' && url?.startsWith('/api/life-fragments/')) {
+  if (
+    method === 'GET' &&
+    url?.startsWith('/api/life-fragments/') &&
+    url !== '/api/life-fragments/stats/summary'
+  ) {
     const id = url.split('/').pop() || '';
     const fragment = lifeFragments.find(f => f.id === id);
 
