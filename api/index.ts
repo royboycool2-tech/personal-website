@@ -1053,8 +1053,15 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
     const publicFragments = lifeFragments.filter(f => f.isPublic);
 
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const requestUrl = new URL(req.url || '/', 'http://localhost');
+    const requestedYear = Number(requestUrl.searchParams.get('year'));
+    const requestedMonth = Number(requestUrl.searchParams.get('month'));
+    const currentMonth = Number.isInteger(requestedMonth) && requestedMonth >= 0 && requestedMonth <= 11
+      ? requestedMonth
+      : now.getMonth();
+    const currentYear = Number.isInteger(requestedYear) && requestedYear >= 2000 && requestedYear <= 2100
+      ? requestedYear
+      : now.getFullYear();
     const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 
     const monthFragments = publicFragments.filter(f => {
@@ -1075,8 +1082,8 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
     });
 
     return res.json({
-      month: monthNames[currentMonth],
-      monthName: monthNames[currentMonth],
+      month: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`,
+      monthName: `${currentYear}年${monthNames[currentMonth]}`,
       totalMoments: monthFragments.length,
       totalPhotos,
       totalLocations: locations.size,
