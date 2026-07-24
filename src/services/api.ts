@@ -442,8 +442,12 @@ export const apiService = {
     return res.json();
   },
 
-  async getStatsSummary(): Promise<StatsSummary> {
-    const res = await fetch(`${API_BASE}/life-fragments/stats/summary`);
+  async getStatsSummary(year?: number, month?: number): Promise<StatsSummary> {
+    const query = new URLSearchParams();
+    if (year !== undefined) query.set('year', String(year));
+    if (month !== undefined) query.set('month', String(month));
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    const res = await fetch(`${API_BASE}/life-fragments/stats/summary${suffix}`);
     if (!res.ok) throw new Error('获取统计信息失败');
     return res.json();
   },
