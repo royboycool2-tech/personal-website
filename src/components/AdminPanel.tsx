@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Eye, EyeOff, LogOut, Save, X, Image as ImageIcon, Calendar, MapPin, Tag, MessageSquare, Bookmark, Palette, User } from 'lucide-react';
-import { authService, apiService, LifeFragment, GuestbookNote, Work, Skill, Growth, Learning, LearningNode } from '../services/api';
+import { Plus, Edit2, Trash2, Eye, EyeOff, LogOut, Save, X, Image as ImageIcon, Calendar, MapPin, Tag, MessageSquare, Bookmark, Palette, User, FileText } from 'lucide-react';
+import {
+  authService,
+  apiService,
+  LifeFragment,
+  GuestbookNote,
+  Work,
+  Skill,
+  Growth,
+  Learning,
+  LearningNode,
+  SiteContent,
+  DEFAULT_SITE_CONTENT
+} from '../services/api';
 import ThemePath from './ThemePath';
 
 const PROJECT_TYPE_OPTIONS = [
@@ -32,13 +44,106 @@ const createEmptyLearningNode = (): LearningNode => ({
   link: '',
 });
 
+interface ContentFieldProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  multiline?: boolean;
+  rows?: number;
+  type?: string;
+  placeholder?: string;
+}
+
+function ContentField({
+  label,
+  value,
+  onChange,
+  multiline = false,
+  rows = 3,
+  type = 'text',
+  placeholder = ''
+}: ContentFieldProps) {
+  const className = 'w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]';
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">{label}</span>
+      {multiline ? (
+        <textarea
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          rows={rows}
+          placeholder={placeholder}
+          className={`${className} resize-y`}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className={className}
+        />
+      )}
+    </label>
+  );
+}
+
+interface ContentImageFieldProps {
+  label: string;
+  value: string;
+  alt: string;
+  uploading: boolean;
+  onChange: (value: string) => void;
+  onUpload: (file?: File) => void;
+}
+
+function ContentImageField({
+  label,
+  value,
+  alt,
+  uploading,
+  onChange,
+  onUpload
+}: ContentImageFieldProps) {
+  return (
+    <div className="space-y-2">
+      <span className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">{label}</span>
+      <div className="grid grid-cols-[96px_minmax(0,1fr)] gap-3 items-center">
+        <div className="w-24 h-24 overflow-hidden rounded-xl border-2 border-[#4A3E26] bg-white">
+          {value ? <img src={value} alt={alt} className="w-full h-full object-cover" /> : null}
+        </div>
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="图片网址"
+            className="w-full bg-white border-2 border-[#4A3E26] px-3 py-2 rounded-xl text-xs font-bold text-[#4A3E26]"
+          />
+          <label className="inline-flex cursor-pointer items-center gap-2 bg-[#D4F0FC] border-2 border-[#4A3E26] px-3 py-2 rounded-xl text-xs font-black shadow-[2px_2px_0_0_#4A3E26]">
+            <ImageIcon className="w-4 h-4" />
+            {uploading ? '上传中...' : '上传新图片'}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              disabled={uploading}
+              onChange={(event) => onUpload(event.target.files?.[0])}
+              className="hidden"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState<'fragments' | 'guestbook' | 'works' | 'about'>(() => {
+  const [activeTab, setActiveTab] = useState<'content' | 'fragments' | 'guestbook' | 'works' | 'about'>(() => {
     const saved = localStorage.getItem('adminActiveTab');
-    if (saved === 'fragments' || saved === 'guestbook' || saved === 'works' || saved === 'about') {
+    if (saved === 'content' || saved === 'fragments' || saved === 'guestbook' || saved === 'works' || saved === 'about') {
       return saved;
     }
-    return 'fragments';
+    return 'content';
   });
   const [fragments, setFragments] = useState<LifeFragment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +152,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [siteContent, setSiteContent] = useState<SiteContent>(() => JSON.parse(JSON.stringify(DEFAULT_SITE_CONTENT)));
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
+  const [uploadingContentField, setUploadingContentField] = useState('');
 
   const [works, setWorks] = useState<Work[]>([]);
   const [isLoadingWorks, setIsLoadingWorks] = useState(false);
@@ -169,6 +277,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
   useEffect(() => {
     localStorage.setItem('adminActiveTab', activeTab);
+    if (activeTab === 'content') {
+      loadSiteContent();
+    }
     if (activeTab === 'guestbook') {
       loadGuestbookNotes();
     }
@@ -181,6 +292,63 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       loadLearning();
     }
   }, [activeTab]);
+
+  const loadSiteContent = async () => {
+    setIsLoadingContent(true);
+    try {
+      setSiteContent(await apiService.getAdminSiteContent());
+    } catch (err: any) {
+      showMessage('error', err.message || '加载页面内容失败');
+    } finally {
+      setIsLoadingContent(false);
+    }
+  };
+
+  const updateContentField = <
+    Section extends keyof SiteContent,
+    Field extends keyof SiteContent[Section]
+  >(section: Section, field: Field, value: SiteContent[Section][Field]) => {
+    setSiteContent(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleContentImageUpload = async (
+    section: 'home' | 'about' | 'life',
+    field: string,
+    file?: File
+  ) => {
+    if (!file) return;
+    const uploadKey = `${section}.${field}`;
+    setUploadingContentField(uploadKey);
+    try {
+      const result = await apiService.uploadImage(file);
+      updateContentField(section, field as never, result.url as never);
+      showMessage('success', '图片上传成功，保存后前端生效');
+    } catch (err: any) {
+      showMessage('error', err.message || '图片上传失败');
+    } finally {
+      setUploadingContentField('');
+    }
+  };
+
+  const handleSiteContentSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsSaving(true);
+    try {
+      const saved = await apiService.updateSiteContent(siteContent);
+      setSiteContent(saved);
+      showMessage('success', '页面内容已保存，刷新前端即可看到变化');
+    } catch (err: any) {
+      showMessage('error', err.message || '页面内容保存失败');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -931,7 +1099,18 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex gap-3 mb-8">
+        <div className="flex flex-wrap gap-3 mb-8">
+          <button
+            onClick={() => setActiveTab('content')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-sm border-4 transition-all ${
+              activeTab === 'content'
+                ? 'bg-[#9B7FD1] text-white border-[#4A3E26] shadow-[4px_4px_0_0_#4A3E26]'
+                : 'bg-white text-[#4A3E26] border-[#4A3E26]/30 hover:border-[#4A3E26]'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            页面内容
+          </button>
           <button
             onClick={() => setActiveTab('fragments')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-sm border-4 transition-all ${
@@ -986,6 +1165,206 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
           }`}>
             {message.text}
           </div>
+        )}
+
+        {activeTab === 'content' && (
+          <form onSubmit={handleSiteContentSubmit} className="space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-black text-[#4A3E26]">📝 页面内容管理</h2>
+                <p className="text-sm text-[#8E6D3B] font-bold mt-1">
+                  按前端出现顺序编辑首页、关于我、作品页、生活页和页脚。列表内容请到对应栏目管理。
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={isSaving || isLoadingContent}
+                className="bg-[#9B7FD1] hover:bg-[#876bc0] disabled:bg-gray-400 border-4 border-[#4A3E26] text-white font-black px-5 py-2.5 rounded-xl shadow-[4px_4px_0_0_#4A3E26] transition-all flex items-center gap-2 text-sm"
+              >
+                <Save className="w-5 h-5" />
+                {isSaving ? '保存中...' : '保存全部页面内容'}
+              </button>
+            </div>
+
+            {isLoadingContent ? (
+              <div className="py-20 text-center font-black text-[#8E6D3B]">正在读取页面内容...</div>
+            ) : (
+              <>
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-[#3BB4FE]">01 · 首页</h3>
+                    <p className="text-xs font-bold text-[#8E6D3B] mt-1">对应 Hey,buddy! 首页的照片、名字和介绍。</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="首页大标题" value={siteContent.home.heroTitle} onChange={value => updateContentField('home', 'heroTitle', value)} />
+                    <ContentField label="创作者小标签" value={siteContent.home.creatorLabel} onChange={value => updateContentField('home', 'creatorLabel', value)} />
+                    <ContentField label="名字上方标题" value={siteContent.home.creatorTitle} onChange={value => updateContentField('home', 'creatorTitle', value)} />
+                    <ContentField label="显示名字" value={siteContent.home.creatorName} onChange={value => updateContentField('home', 'creatorName', value)} />
+                    <ContentField label="左照片说明" value={siteContent.home.leftCaption} onChange={value => updateContentField('home', 'leftCaption', value)} />
+                    <ContentField label="右照片说明" value={siteContent.home.rightCaption} onChange={value => updateContentField('home', 'rightCaption', value)} />
+                    <ContentField label="底部英文介绍" value={siteContent.home.introEnglish} onChange={value => updateContentField('home', 'introEnglish', value)} />
+                    <ContentField label="底部中文介绍" value={siteContent.home.introChinese} onChange={value => updateContentField('home', 'introChinese', value)} />
+                    <ContentField label="引导按钮文字" value={siteContent.home.tourButton} onChange={value => updateContentField('home', 'tourButton', value)} />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                    <ContentImageField
+                      label="首页左侧照片"
+                      value={siteContent.home.leftImage}
+                      alt={siteContent.home.leftImageAlt}
+                      uploading={uploadingContentField === 'home.leftImage'}
+                      onChange={value => updateContentField('home', 'leftImage', value)}
+                      onUpload={file => handleContentImageUpload('home', 'leftImage', file)}
+                    />
+                    <ContentImageField
+                      label="首页右侧照片"
+                      value={siteContent.home.rightImage}
+                      alt={siteContent.home.rightImageAlt}
+                      uploading={uploadingContentField === 'home.rightImage'}
+                      onChange={value => updateContentField('home', 'rightImage', value)}
+                      onUpload={file => handleContentImageUpload('home', 'rightImage', file)}
+                    />
+                  </div>
+                  <details className="bg-white/60 border-2 border-dashed border-[#4A3E26]/30 rounded-2xl p-4">
+                    <summary className="cursor-pointer font-black text-sm text-[#4A3E26]">首页电脑屏幕按钮文字</summary>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <ContentField label="关于我标题" value={siteContent.home.screenAboutTitle} onChange={value => updateContentField('home', 'screenAboutTitle', value)} />
+                      <ContentField label="关于我按钮" value={siteContent.home.screenAboutButton} onChange={value => updateContentField('home', 'screenAboutButton', value)} />
+                      <ContentField label="生活碎片标题" value={siteContent.home.screenLifeTitle} onChange={value => updateContentField('home', 'screenLifeTitle', value)} />
+                      <ContentField label="生活碎片按钮" value={siteContent.home.screenLifeButton} onChange={value => updateContentField('home', 'screenLifeButton', value)} />
+                      <ContentField label="我的作品标题" value={siteContent.home.screenWorksTitle} onChange={value => updateContentField('home', 'screenWorksTitle', value)} />
+                      <ContentField label="我的作品按钮" value={siteContent.home.screenWorksButton} onChange={value => updateContentField('home', 'screenWorksButton', value)} />
+                    </div>
+                  </details>
+                </section>
+
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-[#3BB4FE]">02 · 关于我</h3>
+                    <p className="text-xs font-bold text-[#8E6D3B] mt-1">个人介绍和各个动态卡片区的栏目标题。</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="主标题" value={siteContent.about.heading} onChange={value => updateContentField('about', 'heading', value)} />
+                    <ContentField label="开场问候" value={siteContent.about.greeting} onChange={value => updateContentField('about', 'greeting', value)} />
+                  </div>
+                  <ContentField
+                    label="个人介绍段落（每行一段）"
+                    value={siteContent.about.paragraphs.join('\n')}
+                    onChange={value => updateContentField('about', 'paragraphs', value.split('\n'))}
+                    multiline
+                    rows={9}
+                  />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ContentImageField
+                      label="关于我肖像"
+                      value={siteContent.about.portraitImage}
+                      alt={siteContent.about.portraitAlt}
+                      uploading={uploadingContentField === 'about.portraitImage'}
+                      onChange={value => updateContentField('about', 'portraitImage', value)}
+                      onUpload={file => handleContentImageUpload('about', 'portraitImage', file)}
+                    />
+                    <ContentField label="肖像下方说明" value={siteContent.about.portraitCaption} onChange={value => updateContentField('about', 'portraitCaption', value)} multiline rows={3} />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <ContentField label="能力区主标题" value={siteContent.about.skillsHeading} onChange={value => updateContentField('about', 'skillsHeading', value)} />
+                    <ContentField label="能力区副标题" value={siteContent.about.skillsSubtitle} onChange={value => updateContentField('about', 'skillsSubtitle', value)} />
+                    <ContentField label="能力区手写标题" value={siteContent.about.skillsScript} onChange={value => updateContentField('about', 'skillsScript', value)} />
+                    <ContentField label="学习区主标题" value={siteContent.about.learningHeading} onChange={value => updateContentField('about', 'learningHeading', value)} />
+                    <ContentField label="学习区副标题" value={siteContent.about.learningSubtitle} onChange={value => updateContentField('about', 'learningSubtitle', value)} />
+                    <ContentField label="学习区手写标题" value={siteContent.about.learningScript} onChange={value => updateContentField('about', 'learningScript', value)} />
+                    <ContentField label="成长区主标题" value={siteContent.about.growthHeading} onChange={value => updateContentField('about', 'growthHeading', value)} />
+                    <ContentField label="成长区副标题" value={siteContent.about.growthSubtitle} onChange={value => updateContentField('about', 'growthSubtitle', value)} />
+                    <ContentField label="成长区手写标题" value={siteContent.about.growthScript} onChange={value => updateContentField('about', 'growthScript', value)} />
+                  </div>
+                  <ContentField label="学习区介绍" value={siteContent.about.learningDescription} onChange={value => updateContentField('about', 'learningDescription', value)} multiline />
+                </section>
+
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-5">
+                  <h3 className="text-2xl font-black text-[#3BB4FE]">03 · 作品页</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="作品页主标题" value={siteContent.works.heading} onChange={value => updateContentField('works', 'heading', value)} />
+                    <ContentField label="右侧手写标题" value={siteContent.works.script} onChange={value => updateContentField('works', 'script', value)} />
+                  </div>
+                  <ContentField label="作品页介绍" value={siteContent.works.description} onChange={value => updateContentField('works', 'description', value)} multiline />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="作品页结尾大标题" value={siteContent.works.closingHeading} onChange={value => updateContentField('works', 'closingHeading', value)} />
+                    <ContentField
+                      label="作品页结尾文字（每行一段）"
+                      value={siteContent.works.closingParagraphs.join('\n')}
+                      onChange={value => updateContentField('works', 'closingParagraphs', value.split('\n'))}
+                      multiline
+                      rows={6}
+                    />
+                  </div>
+                </section>
+
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-[#3BB4FE]">04 · 生活碎片与留言板</h3>
+                    <p className="text-xs font-bold text-[#8E6D3B] mt-1">这里只改页面说明；每篇生活记录请到“生活碎片”栏目编辑。</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="生活页大标题" value={siteContent.life.heading} onChange={value => updateContentField('life', 'heading', value)} />
+                    <ContentField label="生活页英文副标题" value={siteContent.life.subtitle} onChange={value => updateContentField('life', 'subtitle', value)} />
+                    <ContentField label="角落介绍标题" value={siteContent.life.aboutTitle} onChange={value => updateContentField('life', 'aboutTitle', value)} />
+                    <ContentField label="角落底部引语" value={siteContent.life.quote} onChange={value => updateContentField('life', 'quote', value)} />
+                    <ContentField label="镜头日记标题" value={siteContent.life.photoTitle} onChange={value => updateContentField('life', 'photoTitle', value)} />
+                    <ContentField label="镜头日记说明" value={siteContent.life.photoDescription} onChange={value => updateContentField('life', 'photoDescription', value)} multiline />
+                    <ContentField label="日常随笔标题" value={siteContent.life.diaryTitle} onChange={value => updateContentField('life', 'diaryTitle', value)} />
+                    <ContentField label="日常随笔说明" value={siteContent.life.diaryDescription} onChange={value => updateContentField('life', 'diaryDescription', value)} multiline />
+                    <ContentField label="闪光时刻标题" value={siteContent.life.momentTitle} onChange={value => updateContentField('life', 'momentTitle', value)} />
+                    <ContentField label="闪光时刻说明" value={siteContent.life.momentDescription} onChange={value => updateContentField('life', 'momentDescription', value)} multiline />
+                    <ContentField label="生活图鉴标题" value={siteContent.life.galleryHeading} onChange={value => updateContentField('life', 'galleryHeading', value)} />
+                    <ContentField label="生活图鉴副标题" value={siteContent.life.gallerySubtitle} onChange={value => updateContentField('life', 'gallerySubtitle', value)} />
+                    <ContentField label="留言板标题" value={siteContent.life.guestbookHeading} onChange={value => updateContentField('life', 'guestbookHeading', value)} />
+                    <ContentField label="留言板副标题" value={siteContent.life.guestbookSubtitle} onChange={value => updateContentField('life', 'guestbookSubtitle', value)} />
+                    <ContentField label="留言纸条底部标签" value={siteContent.life.guestbookTag} onChange={value => updateContentField('life', 'guestbookTag', value)} />
+                  </div>
+                  <details className="bg-white/60 border-2 border-dashed border-[#4A3E26]/30 rounded-2xl p-4">
+                    <summary className="cursor-pointer font-black text-sm text-[#4A3E26]">没有生活照片时显示的备用回忆</summary>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4">
+                      <ContentImageField
+                        label="备用回忆图片"
+                        value={siteContent.life.fallbackMemoryImage}
+                        alt="备用回忆"
+                        uploading={uploadingContentField === 'life.fallbackMemoryImage'}
+                        onChange={value => updateContentField('life', 'fallbackMemoryImage', value)}
+                        onUpload={file => handleContentImageUpload('life', 'fallbackMemoryImage', file)}
+                      />
+                      <div className="space-y-4">
+                        <ContentField label="备用日期" value={siteContent.life.fallbackMemoryDate} onChange={value => updateContentField('life', 'fallbackMemoryDate', value)} />
+                        <ContentField label="备用回忆文字" value={siteContent.life.fallbackMemoryQuote} onChange={value => updateContentField('life', 'fallbackMemoryQuote', value)} multiline />
+                      </div>
+                    </div>
+                  </details>
+                </section>
+
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-5">
+                  <h3 className="text-2xl font-black text-[#3BB4FE]">05 · 页脚与链接</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <ContentField label="页脚大标题（换行直接回车）" value={siteContent.footer.heading} onChange={value => updateContentField('footer', 'heading', value)} multiline />
+                    <ContentField label="页脚中文标语" value={siteContent.footer.slogan} onChange={value => updateContentField('footer', 'slogan', value)} />
+                    <ContentField label="版权文字" value={siteContent.footer.copyright} onChange={value => updateContentField('footer', 'copyright', value)} />
+                    <div />
+                    <ContentField label="隐私政策文字" value={siteContent.footer.privacyLabel} onChange={value => updateContentField('footer', 'privacyLabel', value)} />
+                    <ContentField label="隐私政策链接（可留空）" type="url" value={siteContent.footer.privacyUrl} onChange={value => updateContentField('footer', 'privacyUrl', value)} />
+                    <ContentField label="服务条款文字" value={siteContent.footer.termsLabel} onChange={value => updateContentField('footer', 'termsLabel', value)} />
+                    <ContentField label="服务条款链接（可留空）" type="url" value={siteContent.footer.termsUrl} onChange={value => updateContentField('footer', 'termsUrl', value)} />
+                  </div>
+                </section>
+
+                <div className="sticky bottom-4 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-[#9B7FD1] hover:bg-[#876bc0] disabled:bg-gray-400 border-4 border-[#4A3E26] text-white font-black px-6 py-3 rounded-2xl shadow-[5px_5px_0_0_#4A3E26] transition-all flex items-center gap-2"
+                  >
+                    <Save className="w-5 h-5" />
+                    {isSaving ? '保存中...' : '保存全部并同步前端'}
+                  </button>
+                </div>
+              </>
+            )}
+          </form>
         )}
 
         {activeTab === 'fragments' && (
