@@ -71,3 +71,54 @@
 .animate-bounce-dot {
   animation: bounce-dot 1.2s ease-in-out infinite;
 }
+
+/*
+ * Frontend typography controls.
+ * Values are supplied by the public site-content API and are scoped to the
+ * visitor-facing website so the admin console always remains easy to use.
+ */
+.site-typography {
+  font-weight: var(--site-body-weight, 500);
+}
+
+.site-typography .font-black {
+  font-weight: var(--site-heading-weight, 800);
+}
+
+.site-typography .font-bold,
+.site-typography .font-semibold {
+  font-weight: var(--site-helper-weight, 700);
+}
+
+.site-typography .font-medium,
+.site-typography .font-normal {
+  font-weight: var(--site-body-weight, 500);
+}
+
+.site-typography .site-display-title {
+  font-weight: var(--site-display-weight, 900);
+}
+
+@media (max-width: 640px) {
+  .site-typography {
+    font-weight: var(--site-mobile-body-weight, 400);
+  }
+
+  .site-typography .font-black {
+    font-weight: var(--site-mobile-heading-weight, 700);
+  }
+
+  .site-typography .font-bold,
+  .site-typography .font-semibold {
+    font-weight: var(--site-mobile-helper-weight, 600);
+  }
+
+  .site-typography .font-medium,
+  .site-typography .font-normal {
+    font-weight: var(--site-mobile-body-weight, 400);
+  }
+
+  .site-typography .site-display-title {
+    font-weight: var(--site-mobile-display-weight, 800);
+  }
+}
