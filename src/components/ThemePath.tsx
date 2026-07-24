@@ -92,7 +92,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
                   tabIndex={0}
                 >
                   <div className="flex flex-col gap-1">
-                    <h4 className="font-black text-[#28251F]">{node.title}</h4>
+                    <h4 className="learning-node-title font-black text-[#28251F]">{node.title}</h4>
                     <span className="text-sm font-mono" style={{ color }}>{node.tool}</span>
                   </div>
 
@@ -177,7 +177,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
 
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-black text-[#28251F]">
+                    <h4 className="learning-node-title text-lg font-black text-[#28251F]">
                       {node.title}
                     </h4>
                     <div className="w-6 h-px bg-[#37332B]/30 flex-shrink-0" />
