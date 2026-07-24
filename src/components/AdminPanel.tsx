@@ -137,6 +137,38 @@ function ContentImageField({
   );
 }
 
+interface WeightSelectProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}
+
+function WeightSelect({ label, value, onChange }: WeightSelectProps) {
+  const options = [
+    { value: 300, label: '300 · 较细' },
+    { value: 400, label: '400 · 普通' },
+    { value: 500, label: '500 · 适中' },
+    { value: 600, label: '600 · 半粗' },
+    { value: 700, label: '700 · 粗体' },
+    { value: 800, label: '800 · 很粗' },
+    { value: 900, label: '900 · 最粗' },
+  ];
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]"
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'content' | 'fragments' | 'guestbook' | 'works' | 'about'>(() => {
     const saved = localStorage.getItem('adminActiveTab');
@@ -1339,7 +1371,53 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                 </section>
 
                 <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-5">
-                  <h3 className="text-2xl font-black text-[#3BB4FE]">05 · 页脚与链接</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-2xl font-black text-[#3BB4FE]">05 · 全局文字样式</h3>
+                      <p className="text-xs font-bold text-[#8E6D3B] mt-1">一次调整全站字重；数字越大，文字越粗。</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteContent(prev => ({
+                          ...prev,
+                          typography: { ...DEFAULT_SITE_CONTENT.typography },
+                        }));
+                      }}
+                      className="bg-white border-2 border-[#4A3E26] px-3 py-2 rounded-xl text-xs font-black shadow-[2px_2px_0_0_#4A3E26]"
+                    >
+                      恢复推荐值
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <WeightSelect label="大标题粗细" value={siteContent.typography.displayWeight} onChange={value => updateContentField('typography', 'displayWeight', value)} />
+                    <WeightSelect label="普通标题 / 卡片标题粗细" value={siteContent.typography.headingWeight} onChange={value => updateContentField('typography', 'headingWeight', value)} />
+                    <WeightSelect label="正文粗细" value={siteContent.typography.bodyWeight} onChange={value => updateContentField('typography', 'bodyWeight', value)} />
+                    <WeightSelect label="副标题 / 辅助文字粗细" value={siteContent.typography.helperWeight} onChange={value => updateContentField('typography', 'helperWeight', value)} />
+                  </div>
+                  <label className="flex items-center justify-between gap-4 bg-white border-2 border-[#4A3E26] rounded-2xl px-4 py-3 cursor-pointer">
+                    <div>
+                      <p className="font-black text-sm text-[#4A3E26]">手机端自动减轻一级</p>
+                      <p className="text-xs font-bold text-[#8E6D3B] mt-0.5">小屏幕自动减去 100 字重，让文字不拥挤。</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={siteContent.typography.mobileAutoLighten}
+                      onChange={event => updateContentField('typography', 'mobileAutoLighten', event.target.checked)}
+                      className="w-5 h-5 accent-[#3BB4FE]"
+                    />
+                  </label>
+                  <div className="bg-white border-2 border-dashed border-[#4A3E26]/40 rounded-2xl p-5 space-y-3">
+                    <p className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">当前效果预览</p>
+                    <p className="text-4xl text-[#3BB4FE]" style={{ fontWeight: siteContent.typography.displayWeight }}>这是大标题 Display</p>
+                    <p className="text-xl text-[#4A3E26]" style={{ fontWeight: siteContent.typography.headingWeight }}>这是普通标题和卡片标题</p>
+                    <p className="text-sm text-[#4A3E26]" style={{ fontWeight: siteContent.typography.bodyWeight }}>这是正文内容，用来阅读较长的个人介绍和项目说明。</p>
+                    <p className="text-xs text-[#8E6D3B]" style={{ fontWeight: siteContent.typography.helperWeight }}>这是副标题、标签和辅助说明文字。</p>
+                  </div>
+                </section>
+
+                <section className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[5px_5px_0_0_#4A3E26] space-y-5">
+                  <h3 className="text-2xl font-black text-[#3BB4FE]">06 · 页脚与链接</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <ContentField label="页脚大标题（换行直接回车）" value={siteContent.footer.heading} onChange={value => updateContentField('footer', 'heading', value)} multiline />
                     <ContentField label="页脚中文标语" value={siteContent.footer.slogan} onChange={value => updateContentField('footer', 'slogan', value)} />
