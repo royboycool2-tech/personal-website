@@ -357,8 +357,21 @@ export default function App() {
     new Date().getFullYear(),
     ...lifeFragments.map((fragment) => new Date(fragment.date.replace(/\./g, '-')).getFullYear())
   ]))
-    .filter((year) => Number.isFinite(year))
+    .filter((year) => Number.isFinite(year) && year <= new Date().getFullYear())
     .sort((a, b) => b - a);
+
+  const currentCalendarYear = new Date().getFullYear();
+  const currentCalendarMonth = new Date().getMonth();
+  const selectableStatsMonths = Array.from(
+    { length: statsYear === currentCalendarYear ? currentCalendarMonth + 1 : 12 },
+    (_, month) => month
+  );
+
+  useEffect(() => {
+    if (statsYear === currentCalendarYear && statsMonth > currentCalendarMonth) {
+      setStatsMonth(currentCalendarMonth);
+    }
+  }, [statsYear, statsMonth, currentCalendarYear, currentCalendarMonth]);
 
   // Does this record belong to the month currently selected in the summary card?
   const isSelectedStatsMonth = (dateStr: string): boolean => {
@@ -1407,14 +1420,11 @@ export default function App() {
                           className="min-w-0 rounded-lg border-2 border-[#4A3E26] bg-white px-2 py-1 text-center text-xs font-bold text-[#4A3E26] focus:outline-none"
                           aria-label="统计月份"
                         >
-                          {Array.from({ length: 12 }, (_, month) => (
+                          {selectableStatsMonths.map((month) => (
                             <option key={month} value={month}>{month + 1}月</option>
                           ))}
                         </select>
                       </div>
-                      <p className="text-[10px] text-[#8E6D3B] mt-2">
-                        {statsSummary ? statsSummary.monthName : `${statsYear}年${statsMonth + 1}月`}
-                      </p>
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center gap-3">
