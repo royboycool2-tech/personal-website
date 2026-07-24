@@ -429,7 +429,7 @@ export default function App() {
     <div
       id="personal_website_container"
       style={typographyVariables}
-      className="site-typography min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-12"
+      className="site-typography site-copy-font min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-12"
     >
       
       {/* TOP SYSTEM NAV BAR (Mustard yellow top plate styled retro block style) */}
@@ -727,7 +727,7 @@ export default function App() {
                   </h2>
                 </div>
 
-                <div className="text-base md:text-lg leading-relaxed text-[#4A3E26] space-y-4">
+                <div className="site-copy-font site-red-copy text-base md:text-lg leading-relaxed text-[#4A3E26] space-y-4">
                   <p className="font-bold text-2xl text-[#4A3E26]">
                     {siteContent.about.greeting}
                   </p>
@@ -787,7 +787,7 @@ export default function App() {
               </div>
 
               {/* Dynamic skill cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="site-copy-font site-red-copy grid grid-cols-1 md:grid-cols-3 gap-6">
                 {skills.map(skill => (
                   <div
                     key={skill.id}
@@ -812,7 +812,7 @@ export default function App() {
             </div>
 
             {/* Section C: ABOUT LEARNING */}
-            <div className="space-y-16 pt-8 border-t-4 border-dashed border-[#4A3E26] relative">
+            <div className="site-copy-font site-red-copy space-y-16 pt-8 border-t-4 border-dashed border-[#4A3E26] relative">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
                   <h2 className="site-display-title text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
@@ -860,7 +860,7 @@ export default function App() {
               </div>
 
               {/* Dynamic growth cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="site-copy-font site-red-copy grid grid-cols-1 md:grid-cols-3 gap-6">
                 {growthItems.map((growth, index) => (
                   <div
                     key={growth.id}
@@ -1878,7 +1878,7 @@ export default function App() {
                   </React.Fragment>
                 ))}
               </h2>
-              <p className="font-handwriting text-lg text-[#8E6D3B]">
+              <p className="site-copy-font site-red-copy text-lg text-[#8E6D3B]">
                 {siteContent.footer.slogan}
               </p>
             </div>
