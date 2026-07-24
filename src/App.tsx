@@ -78,6 +78,8 @@ export default function App() {
   const [isAdminRoute, setIsAdminRoute] = useState(false);
   const [isAdminVerified, setIsAdminVerified] = useState(false);
   const [statsSummary, setStatsSummary] = useState<StatsSummary | null>(null);
+  const [statsYear, setStatsYear] = useState(() => new Date().getFullYear());
+  const [statsMonth, setStatsMonth] = useState(() => new Date().getMonth());
   const [isLoadingFragments, setIsLoadingFragments] = useState(false);
   const [worksList, setWorksList] = useState<Work[]>([]);
   const [isLoadingWorks, setIsLoadingWorks] = useState(false);
@@ -142,9 +144,9 @@ export default function App() {
     }
   }, [isAdminRoute]);
 
-  const loadStatsSummary = async () => {
+  const loadStatsSummary = async (year: number, month: number) => {
     try {
-      const stats = await apiService.getStatsSummary();
+      const stats = await apiService.getStatsSummary(year, month);
       setStatsSummary(stats);
     } catch (err) {
       console.error('Failed to load stats:', err);
@@ -215,13 +217,18 @@ export default function App() {
     if (!isAdminRoute) {
       loadSiteContent();
       loadLifeFragments();
-      loadStatsSummary();
       loadSkills();
       loadGrowth();
       loadLearning();
       loadWorks();
     }
   }, [isAdminRoute]);
+
+  useEffect(() => {
+    if (!isAdminRoute) {
+      loadStatsSummary(statsYear, statsMonth);
+    }
+  }, [isAdminRoute, statsYear, statsMonth]);
 
   // Guestbook States
   const [notes, setNotes] = useState<StickyNote[]>([]);
@@ -346,11 +353,17 @@ export default function App() {
     moment: lifeFragments.filter(f => f.category === 'moment').length,
   };
 
-  // Is current month filter active
-  const isCurrentMonth = (dateStr: string): boolean => {
-    const now = new Date();
+  const availableStatsYears = Array.from(new Set([
+    new Date().getFullYear(),
+    ...lifeFragments.map((fragment) => new Date(fragment.date.replace(/\./g, '-')).getFullYear())
+  ]))
+    .filter((year) => Number.isFinite(year))
+    .sort((a, b) => b - a);
+
+  // Does this record belong to the month currently selected in the summary card?
+  const isSelectedStatsMonth = (dateStr: string): boolean => {
     const date = new Date(dateStr.replace(/\./g, '-'));
-    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    return date.getMonth() === statsMonth && date.getFullYear() === statsYear;
   };
 
   // Filtered and sorted fragments
@@ -362,7 +375,7 @@ export default function App() {
     }
     
     if (viewMonthFilter) {
-      result = result.filter(f => isCurrentMonth(f.date));
+      result = result.filter(f => isSelectedStatsMonth(f.date));
     }
     
     result.sort((a, b) => {
@@ -1375,10 +1388,32 @@ export default function App() {
                   <div className="border-4 border-[#4A3E26] rounded-2xl p-5 bg-[#FCF9EE] flex flex-col gap-4 shadow-[4px_4px_0_0_#4A3E26]">
                     <div className="text-center pb-3 border-b-2 border-dashed border-[#4A3E26]">
                       <h4 className="font-black text-lg text-[#4A3E26] flex items-center justify-center gap-1.5">
-                        📊 本月记忆统计
+                        📊 月度记忆统计
                       </h4>
-                      <p className="text-[10px] text-[#8E6D3B] mt-1">
-                        {statsSummary ? statsSummary.monthName : '本月'}
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        <select
+                          value={statsYear}
+                          onChange={(event) => setStatsYear(Number(event.target.value))}
+                          className="min-w-0 rounded-lg border-2 border-[#4A3E26] bg-white px-2 py-1 text-center text-xs font-bold text-[#4A3E26] focus:outline-none"
+                          aria-label="统计年份"
+                        >
+                          {availableStatsYears.map((year) => (
+                            <option key={year} value={year}>{year}年</option>
+                          ))}
+                        </select>
+                        <select
+                          value={statsMonth}
+                          onChange={(event) => setStatsMonth(Number(event.target.value))}
+                          className="min-w-0 rounded-lg border-2 border-[#4A3E26] bg-white px-2 py-1 text-center text-xs font-bold text-[#4A3E26] focus:outline-none"
+                          aria-label="统计月份"
+                        >
+                          {Array.from({ length: 12 }, (_, month) => (
+                            <option key={month} value={month}>{month + 1}月</option>
+                          ))}
+                        </select>
+                      </div>
+                      <p className="text-[10px] text-[#8E6D3B] mt-2">
+                        {statsSummary ? statsSummary.monthName : `${statsYear}年${statsMonth + 1}月`}
                       </p>
                     </div>
 
@@ -1426,7 +1461,7 @@ export default function App() {
                           : 'bg-[#F3C556] text-[#4A3E26] hover:bg-[#ebd54c]'
                       }`}
                     >
-                      {viewMonthFilter ? '✓ 已筛选本月' : '查看本月记录'}
+                      {viewMonthFilter ? `✓ 已筛选${statsMonth + 1}月` : `查看${statsMonth + 1}月记录`}
                     </button>
                   </div>
 
@@ -1480,7 +1515,7 @@ export default function App() {
                       onClick={() => setViewMonthFilter(false)}
                       className="text-xs font-bold text-[#8E6D3B] hover:text-[#4A3E26] underline self-start sm:self-auto"
                     >
-                      ← 取消本月筛选
+                      ← 取消月份筛选
                     </button>
                   )}
                 </div>
