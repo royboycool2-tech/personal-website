@@ -580,7 +580,7 @@ export default function App() {
                 <div className="relative w-80 sm:w-96 bg-[#F3C556] border-4 border-[#4A3E26] rounded-[3rem] p-6 shadow-[8px_8px_0_0_#4A3E26] flex flex-col gap-4">
                   
                   {/* Inside Cyber Screen (Cyan background with drawing squiggles) */}
-                  <div className="bg-[#3BB4FE] border-4 border-[#4A3E26] rounded-2xl p-4 aspect-[4/3] flex flex-col justify-between relative overflow-hidden">
+                  <div className="bg-[#3BB4FE] border-4 border-[#4A3E26] rounded-2xl p-4 aspect-square sm:aspect-[4/3] flex flex-col justify-between relative overflow-hidden">
                     
                     {/* Retro lines pattern overlay */}
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
