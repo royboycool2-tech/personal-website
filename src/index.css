@@ -188,6 +188,23 @@
   line-height: 1.6 !important;
 }
 
+/* About intro: main paragraphs are two pixels smaller than the +4 copy preset. */
+.site-typography .site-about-main-copy {
+  font-size: calc(var(--site-body-size, 16px) + 2px) !important;
+}
+
+/* Closing sentences match the skill-title face and color without changing weight. */
+.site-typography .site-about-closing-copy {
+  color: #4A3E26 !important;
+  font-family: 'Plus Jakarta Sans', 'ZCOOL KuaiLe', sans-serif !important;
+  font-style: normal !important;
+}
+
+/* Learning checklist titles are one weight step lighter. */
+.site-typography .learning-node-title {
+  font-weight: calc(var(--site-heading-weight, 600) - 100) !important;
+}
+
 @media (max-width: 640px) {
   .site-typography {
     font-size: var(--site-mobile-body-size, 16px);
@@ -267,5 +284,13 @@
   .site-typography .site-red-copy [class*="text-[10px]"],
   .site-typography .site-red-copy [class*="text-[9px]"] {
     font-size: calc(var(--site-mobile-helper-size, 13px) + 4px) !important;
+  }
+
+  .site-typography .site-about-main-copy {
+    font-size: calc(var(--site-mobile-body-size, 16px) + 2px) !important;
+  }
+
+  .site-typography .learning-node-title {
+    font-weight: calc(var(--site-mobile-heading-weight, 600) - 100) !important;
   }
 }

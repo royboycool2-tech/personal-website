@@ -107,6 +107,17 @@ export default function App() {
     setIsAdminRoute(true);
   };
 
+  const navigateToTabTop = (tab: 'home' | 'about' | 'works' | 'life') => {
+    setActiveTab(tab);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
+    });
+  };
+
   const verifyAdminStatus = async () => {
     if (!authService.getToken()) {
       setIsAdminVerified(false);
@@ -575,7 +586,7 @@ export default function App() {
                           <div className="text-4xl mb-3">👋</div>
                           <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenAboutTitle}</h3>
                           <button 
-                            onClick={() => setActiveTab('about')}
+                            onClick={() => navigateToTabTop('about')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
                             {siteContent.home.screenAboutButton}
@@ -587,7 +598,7 @@ export default function App() {
                           <div className="text-4xl mb-3">📸</div>
                           <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenLifeTitle}</h3>
                           <button 
-                            onClick={() => setActiveTab('life')}
+                            onClick={() => navigateToTabTop('life')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
                             {siteContent.home.screenLifeButton}
@@ -599,7 +610,7 @@ export default function App() {
                           <div className="text-4xl mb-3">🎨</div>
                           <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenWorksTitle}</h3>
                           <button 
-                            onClick={() => setActiveTab('works')}
+                            onClick={() => navigateToTabTop('works')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
                             {siteContent.home.screenWorksButton}
@@ -662,7 +673,7 @@ export default function App() {
               <div className="lg:col-span-3 flex flex-col gap-8 items-center lg:items-end">
                 
                 {/* Polaroid 2 - Beanie portrait */}
-                <div className="polaroid-tilt-right bg-white border-4 border-[#7CC8F2] p-4 pb-8 w-64 shadow-[6px_6px_0_0_#7CC8F2] flex flex-col gap-3 relative -mt-4">
+                <div className="polaroid-tilt-right bg-white border-4 border-[#7CC8F2] p-4 pb-8 w-64 shadow-[6px_6px_0_0_#7CC8F2] flex flex-col gap-3 relative mt-8 lg:mt-12">
                   
                   {/* Spiky gear badge overlay on photo corner */}
                   <div className="absolute -top-6 -right-6 w-14 h-14 bg-[#3BB4FE] border-4 border-[#4A3E26] flex items-center justify-center animate-bounce" style={{ clipPath: 'polygon(50% 0%, 83% 12%, 100% 43%, 91% 78%, 61% 100%, 25% 91%, 0% 61%, 12% 25%)' }}>
@@ -736,10 +747,10 @@ export default function App() {
                       key={`${index}-${paragraph.slice(0, 12)}`}
                       className={
                         index === 0
-                          ? 'text-[#8E6D3B]'
+                          ? 'site-about-main-copy text-[#8E6D3B]'
                           : index >= siteContent.about.paragraphs.length - 2
-                            ? 'font-bold italic'
-                            : ''
+                            ? 'site-about-closing-copy font-bold'
+                            : 'site-about-main-copy'
                       }
                     >
                       {paragraph}
