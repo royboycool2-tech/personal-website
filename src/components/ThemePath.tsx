@@ -16,11 +16,12 @@ export interface ThemePathProps {
   color: string;
   status?: string;
   nodes: ThemePathNode[];
+  alwaysExpanded?: boolean;
 }
 
 const DEFAULT_STATUS = '持续探索中';
 
-export default function ThemePath({ id, title, description, color, status = DEFAULT_STATUS, nodes }: ThemePathProps) {
+export default function ThemePath({ id, title, description, color, status = DEFAULT_STATUS, nodes, alwaysExpanded = false }: ThemePathProps) {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -71,7 +72,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
 
         <div className="relative pl-6 space-y-4">
           {nodes.map((node, index) => {
-            const isActive = hoveredNode === node.id;
+            const isActive = alwaysExpanded || hoveredNode === node.id;
 
             return (
               <div key={node.id} className="relative">
@@ -85,11 +86,11 @@ export default function ThemePath({ id, title, description, color, status = DEFA
                 )}
 
                 <div 
-                  className="ml-8 cursor-pointer py-2"
-                  onMouseEnter={() => setHoveredNode(node.id)}
-                  onMouseLeave={() => setHoveredNode(null)}
-                  onClick={() => setHoveredNode(isActive ? null : node.id)}
-                  tabIndex={0}
+                  className={`ml-8 py-2 ${alwaysExpanded ? 'cursor-default' : 'cursor-pointer'}`}
+                  onMouseEnter={() => !alwaysExpanded && setHoveredNode(node.id)}
+                  onMouseLeave={() => !alwaysExpanded && setHoveredNode(null)}
+                  onClick={() => !alwaysExpanded && setHoveredNode(isActive ? null : node.id)}
+                  tabIndex={alwaysExpanded ? -1 : 0}
                 >
                   <div className="flex flex-col gap-1">
                     <h4 className="learning-node-title font-black text-[#28251F]">{node.title}</h4>
@@ -148,7 +149,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
 
       <div className="space-y-6">
         {nodes.map((node, index) => {
-          const isActive = hoveredNode === node.id;
+          const isActive = alwaysExpanded || hoveredNode === node.id;
 
           return (
             <div
@@ -159,12 +160,13 @@ export default function ThemePath({ id, title, description, color, status = DEFA
               style={{ transitionDelay: `${index * 120}ms` }}
             >
               <button
-                className="group flex items-start gap-3 w-full text-left cursor-pointer"
-                onMouseEnter={() => setHoveredNode(node.id)}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setHoveredNode(isActive ? null : node.id)}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && setHoveredNode(isActive ? null : node.id)}
+                className={`group flex items-start gap-3 w-full text-left ${alwaysExpanded ? 'cursor-default' : 'cursor-pointer'}`}
+                onMouseEnter={() => !alwaysExpanded && setHoveredNode(node.id)}
+                onMouseLeave={() => !alwaysExpanded && setHoveredNode(null)}
+                onClick={() => !alwaysExpanded && setHoveredNode(isActive ? null : node.id)}
+                tabIndex={alwaysExpanded ? -1 : 0}
+                aria-expanded={isActive}
+                onKeyDown={(e) => e.key === 'Enter' && !alwaysExpanded && setHoveredNode(isActive ? null : node.id)}
               >
                 <div 
                   className={`w-4 h-4 rounded-full border-2 border-[#37332B] flex-shrink-0 mt-1 transition-all duration-300 z-30`}
