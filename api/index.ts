@@ -156,46 +156,49 @@ let guestbookNotes: GuestbookNote[] = [
 
 let lifeFragments: LifeFragment[] = [
   {
+    id: 'life-1784717539812',
+    title: '吃吃吃',
+    content: '大小碗螺蛳粉，lxy说吃大碗螺蛳粉吃出了线面的感觉（越吃越多）',
+    date: '2026.07.22',
+    category: 'diary',
+    location: '深圳',
+    mood: '🤭',
+    weather: '⛅',
+    tags: ['美食'],
+    images: ['/uploads/life-1784717538375-802981132.jpg'],
+    isPublic: true,
+    createdAt: '2026-07-22T10:52:19.812Z',
+    updatedAt: '2026-07-22T10:53:31.588Z'
+  },
+  {
+    id: 'life-1784715242656',
+    title: '美甲💅',
+    content: '第一次做美甲，感觉还不错~',
+    date: '2026.07.10',
+    category: 'moment',
+    location: '深圳',
+    mood: '😄',
+    weather: '☀️',
+    tags: ['日常'],
+    images: ['/uploads/life-1784715238192-816101296.jpg'],
+    isPublic: true,
+    createdAt: '2026-07-22T10:14:02.656Z',
+    updatedAt: '2026-07-22T10:17:13.067Z'
+  },
+  {
     id: 'life1',
     title: '夏天开始有了形状',
-    content: '下班时天还很亮，风里已经有夏天的味道。路过花店时拍下了今天最喜欢的一小块颜色。',
-    date: '2025.06.18',
+    content: '夏天见面，“圳”的幸运',
+    date: '2026.7.19',
     category: 'photo',
     location: '深圳',
-    weather: '☀️',
-    tags: ['下班路上', '生活随拍'],
-    images: [],
+    mood: '😄',
+    weather: '🌧️',
+    tags: ['演唱会'],
+    images: ['/uploads/life-1784715037654-754999767.jpg'],
     isPublic: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'life2',
-    title: '一碗面的治愈',
-    content: '下雨天不想做饭，下楼吃了一碗热乎乎的番茄鸡蛋面。简单的食物，最抚凡人心。',
-    date: '2025.05.10',
-    category: 'diary',
-    location: '家楼下',
-    mood: '🍜',
-    tags: ['美食', '日常'],
-    images: [],
-    isPublic: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'life3',
-    title: '第一次做手冲咖啡',
-    content: '跟着教程学了手冲，虽然比例还没掌握好，但整个过程很治愈。闻着咖啡香，时间都慢下来了。',
-    date: '2025.04.05',
-    category: 'moment',
-    location: '家',
-    mood: '☕',
-    tags: ['新尝试', '成长'],
-    images: [],
-    isPublic: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: '2026-07-22T10:08:43.509Z',
+    updatedAt: '2026-07-22T10:53:56.135Z'
   }
 ];
 
@@ -469,6 +472,8 @@ const STORAGE_KEYS = {
   growth: 'personal-website:growth',
   learning: 'personal-website:learning',
 } as const;
+const LIFE_FRAGMENTS_SEED_VERSION_KEY = 'personal-website:life-fragments-seed-version';
+const LIFE_FRAGMENTS_SEED_VERSION = '2026-07-24-local-photos-v1';
 
 async function loadCollection<T>(key: string, fallback: T[]): Promise<T[]> {
   const stored = await redis.get<T[]>(key);
@@ -485,6 +490,12 @@ async function loadState(): Promise<void> {
   const skillsFallback = skills;
   const growthFallback = growth;
   const learningFallback = learning;
+
+  const migratedVersion = await redis.get<string>(LIFE_FRAGMENTS_SEED_VERSION_KEY);
+  if (migratedVersion !== LIFE_FRAGMENTS_SEED_VERSION) {
+    await redis.set(STORAGE_KEYS.lifeFragments, lifeFragmentsFallback);
+    await redis.set(LIFE_FRAGMENTS_SEED_VERSION_KEY, LIFE_FRAGMENTS_SEED_VERSION);
+  }
 
   [
     guestbookNotes,
