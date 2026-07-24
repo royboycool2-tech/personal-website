@@ -20,7 +20,17 @@ import {
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import ThemePath from './components/ThemePath';
-import { authService, apiService, StatsSummary, Work, Skill, Growth, Learning } from './services/api';
+import {
+  authService,
+  apiService,
+  StatsSummary,
+  Work,
+  Skill,
+  Growth,
+  Learning,
+  SiteContent,
+  DEFAULT_SITE_CONTENT
+} from './services/api';
 
 // Define Interface for Sticky Notes
 interface StickyNote {
@@ -74,6 +84,7 @@ export default function App() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [growthItems, setGrowthItems] = useState<Growth[]>([]);
   const [learningItems, setLearningItems] = useState<Learning[]>([]);
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
 
   const checkAdminRoute = () => {
     const path = window.location.pathname;
@@ -174,8 +185,18 @@ export default function App() {
     }
   };
 
+  const loadSiteContent = async () => {
+    try {
+      const content = await apiService.getSiteContent();
+      setSiteContent(content);
+    } catch (err) {
+      console.error('Failed to load page content:', err);
+    }
+  };
+
   useEffect(() => {
     if (!isAdminRoute) {
+      loadSiteContent();
       loadLifeFragments();
       loadStatsSummary();
       loadSkills();
@@ -224,26 +245,12 @@ export default function App() {
       }))
     );
 
-  const dailyMemories = photoMemories.length > 0 ? photoMemories : [
-    {
-      id: 'mem1',
-      date: '2025.04.17',
-      image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=warm%20sunny%20afternoon%20light%20through%20window%20on%20wooden%20desk%20with%20coffee%20cup%20and%20plant&image_size=square_hd',
-      quote: '当时没有觉得特别，后来却很想念。'
-    },
-    {
-      id: 'mem2',
-      date: '2025.06.18',
-      image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sunset%20sky%20with%20orange%20clouds%20summer%20evening%20city%20street&image_size=square_hd',
-      quote: '夏天开始有了形状，风里都是温柔的味道。'
-    },
-    {
-      id: 'mem3',
-      date: '2025.03.22',
-      image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cherry%20blossom%20tree%20pink%20flowers%20spring%20park%20benches&image_size=square_hd',
-      quote: '春天来得很慢，春天才有浪漫。'
-    }
-  ];
+  const dailyMemories = photoMemories.length > 0 ? photoMemories : [{
+    id: 'fallback-memory',
+    date: siteContent.life.fallbackMemoryDate,
+    image: siteContent.life.fallbackMemoryImage,
+    quote: siteContent.life.fallbackMemoryQuote
+  }];
 
   // Interactive Work Settings (for details popup)
   const [sunsetGlow, setSunsetGlow] = useState(60);
@@ -494,7 +501,7 @@ export default function App() {
             {/* Display Big Bold Heading - Hey,buddy! */}
             <div className="relative text-center py-4">
               <h1 className="text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
-                Hey,buddy!
+                {siteContent.home.heroTitle}
               </h1>
               {/* Spiky Blue badge overlay */}
               <div className="absolute right-4 md:right-16 top-0 transform translate-y-12 animate-float">
@@ -512,13 +519,13 @@ export default function App() {
                 <div className="polaroid-tilt-left bg-white border-4 border-[#7CC8F2] p-4 pb-8 w-64 md:w-72 shadow-[6px_6px_0_0_#7CC8F2] flex flex-col gap-3" style={{ marginTop: '-3cm' }}>
                   <div className="aspect-square bg-[#E8DFF5] border-2 border-[#4A3E26] overflow-hidden rounded">
                     <img 
-                      src="/96d711b6-dd57-4a44-8c37-eb9d21ac1c99.png" 
-                      alt="四金的肖像照 1" 
+                      src={siteContent.home.leftImage}
+                      alt={siteContent.home.leftImageAlt}
                       className="w-full h-full object-cover hover:scale-105 transition-all duration-300"
                     />
                   </div>
                   <div className="border-t-2 border-dashed border-[#4A3E26] pt-3 text-center">
-                    <p className="font-handwriting text-lg text-[#8E6D3B] font-bold">生而自由，爱而无畏</p>
+                    <p className="font-handwriting text-lg text-[#8E6D3B] font-bold">{siteContent.home.leftCaption}</p>
                   </div>
                 </div>
               </div>
@@ -540,36 +547,36 @@ export default function App() {
                       {screenTab === 'about' && (
                         <div key="about" className="screen-content animate-fade-in text-center px-2">
                           <div className="text-4xl mb-3">👋</div>
-                          <h3 className="font-handwriting text-xl font-black mb-4">关于我</h3>
+                          <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenAboutTitle}</h3>
                           <button 
                             onClick={() => setActiveTab('about')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
-                            了解更多 →
+                            {siteContent.home.screenAboutButton}
                           </button>
                         </div>
                       )}
                       {screenTab === 'life' && (
                         <div key="life" className="screen-content animate-fade-in text-center px-2">
                           <div className="text-4xl mb-3">📸</div>
-                          <h3 className="font-handwriting text-xl font-black mb-4">生活碎片</h3>
+                          <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenLifeTitle}</h3>
                           <button 
                             onClick={() => setActiveTab('life')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
-                            去逛逛 →
+                            {siteContent.home.screenLifeButton}
                           </button>
                         </div>
                       )}
                       {screenTab === 'works' && (
                         <div key="works" className="screen-content animate-fade-in text-center px-2">
                           <div className="text-4xl mb-3">🎨</div>
-                          <h3 className="font-handwriting text-xl font-black mb-4">我的作品</h3>
+                          <h3 className="font-handwriting text-xl font-black mb-4">{siteContent.home.screenWorksTitle}</h3>
                           <button 
                             onClick={() => setActiveTab('works')}
                             className="bg-white text-[#3BB4FE] px-4 py-1.5 rounded-full text-sm font-bold border-2 border-[#4A3E26] shadow-[2px_2px_0_0_#4A3E26] hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_#4A3E26] transition-all"
                           >
-                            查看作品 →
+                            {siteContent.home.screenWorksButton}
                           </button>
                         </div>
                       )}
@@ -638,13 +645,13 @@ export default function App() {
 
                   <div className="aspect-square bg-[#FFE9A6] border-2 border-[#4A3E26] overflow-hidden rounded">
                     <img 
-                      src="/ef62c276-8600-4522-ad7e-08be636b13e3.png" 
-                      alt="四金的肖像照 2" 
+                      src={siteContent.home.rightImage}
+                      alt={siteContent.home.rightImageAlt}
                       className="w-full h-full object-cover hover:scale-105 transition-all duration-300"
                     />
                   </div>
                   <div className="border-t-2 border-dashed border-[#4A3E26] pt-3 text-center">
-                    <p className="font-handwriting text-lg text-[#8E6D3B] font-bold">今天的太阳比昨天大 🔆</p>
+                    <p className="font-handwriting text-lg text-[#8E6D3B] font-bold">{siteContent.home.rightCaption}</p>
                   </div>
                 </div>
 
@@ -654,9 +661,9 @@ export default function App() {
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-red-500 border-2 border-[#4A3E26] rounded-full shadow-md"></div>
                   
                   <div className="text-center pt-1 font-display space-y-1">
-                    <p className="text-[#8E6D3B] text-xs tracking-wider">CREATOR</p>
-                    <h3 className="text-2xl font-black text-[#4A3E26]">我的名字</h3>
-                    <p className="text-3xl font-bold text-[#3BB4FE] font-handwriting mt-1">四金</p>
+                    <p className="text-[#8E6D3B] text-xs tracking-wider">{siteContent.home.creatorLabel}</p>
+                    <h3 className="text-2xl font-black text-[#4A3E26]">{siteContent.home.creatorTitle}</h3>
+                    <p className="text-3xl font-bold text-[#3BB4FE] font-handwriting mt-1">{siteContent.home.creatorName}</p>
                   </div>
                 </div>
               </div>
@@ -665,15 +672,15 @@ export default function App() {
             {/* Slogan section and guided tour button */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-12 border-t-4 border-dashed border-[#4A3E26]">
               <div className="text-center md:text-left space-y-1">
-                <p className="text-xs text-[#8E6D3B] tracking-widest font-black uppercase">A wanderer between inspiration and reality</p>
-                <h3 className="text-2xl font-bold text-[#4A3E26] font-display">在灵感与现实之间 慢慢生长的温暖追光者。</h3>
+                <p className="text-xs text-[#8E6D3B] tracking-widest font-black uppercase">{siteContent.home.introEnglish}</p>
+                <h3 className="text-2xl font-bold text-[#4A3E26] font-display">{siteContent.home.introChinese}</h3>
               </div>
 
               <button 
                 onClick={() => { setActiveTab('about'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="bg-[#F3C556] border-4 border-[#4A3E26] hover:bg-[#ebd54c] active:translate-y-1 text-[#4A3E26] font-black px-6 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-[4px_4px_0_0_#4A3E26] transition-all whitespace-nowrap text-sm"
               >
-                THIS IS YOUR GUIDED TOUR OF ME...... 
+                {siteContent.home.tourButton}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -690,29 +697,28 @@ export default function App() {
               <div className="md:col-span-7 space-y-6">
                 <div className="flex items-center gap-2">
                   <h2 className="text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                    ABOUT ME <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0s' }}>*</span>
+                    {siteContent.about.heading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0s' }}>*</span>
                   </h2>
                 </div>
 
                 <div className="text-base md:text-lg leading-relaxed text-[#4A3E26] space-y-4">
                   <p className="font-bold text-2xl text-[#4A3E26]">
-                    嗨，我是四金。
+                    {siteContent.about.greeting}
                   </p>
-                  <p className="text-[#8E6D3B]">
-                    2004年出生，现阶段保持慢节奏的自我沉淀与持续成长。
-                  </p>
-                  <p>
-                    我相信生活是由细节拼成的——窗台上慢慢移动的光，老巷子里那棵槐树四季换样子，朋友不经意说出口却刚好戳中的话。我喜欢收集这些，它们是我看待世界的方式，也悄悄变成我的一部分。
-                  </p>
-                  <p>
-                    我对喜欢的事有一种执拗的认真。会为一个小问题反复琢磨，会为一件事翻遍资料，享受那种沉浸进去、时间消失的感觉。比起结果，我更在意过程里有没有真正"在场"。
-                  </p>
-                  <p className="font-bold italic">
-                    还在成长，但方向很笃定——做个认真生活、慢慢发光的人。
-                  </p>
-                  <p className="font-bold italic">
-                    不急着被定义，也不急着赶路。
-                  </p>
+                  {siteContent.about.paragraphs.map((paragraph, index) => (
+                    <p
+                      key={`${index}-${paragraph.slice(0, 12)}`}
+                      className={
+                        index === 0
+                          ? 'text-[#8E6D3B]'
+                          : index >= siteContent.about.paragraphs.length - 2
+                            ? 'font-bold italic'
+                            : ''
+                      }
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               </div>
 
@@ -727,13 +733,13 @@ export default function App() {
 
                   <div className="aspect-square bg-[#FFFDE5] border-2 border-[#4A3E26] overflow-hidden rounded mb-4">
                     <img 
-                      src="/96d711b6-dd57-4a44-8c37-eb9d21ac1c99.png" 
-                      alt="关于我 肖像" 
+                      src={siteContent.about.portraitImage}
+                      alt={siteContent.about.portraitAlt}
                       className="w-full h-full object-cover filter saturate-105"
                     />
                   </div>
                   <div className="text-center font-handwriting text-xl text-[#8E6D3B] font-black">
-                    在极小的事物里发现极大的宇宙 ✦
+                    {siteContent.about.portraitCaption}
                   </div>
                 </div>
               </div>
@@ -744,13 +750,13 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
                   <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                    ABOUT SKILLS <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.15s' }}>*</span>
+                    {siteContent.about.skillsHeading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.15s' }}>*</span>
                   </h2>
-                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">我的能力</p>
+                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.skillsSubtitle}</p>
                 </div>
                 {/* Handwritten script annotation */}
                 <span className="font-handwriting text-4xl text-[#4A3E26] rotate-[-4deg] self-start sm:self-auto translate-y-2 select-none">
-                  My Skills
+                  {siteContent.about.skillsScript}
                 </span>
               </div>
 
@@ -784,15 +790,15 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
                   <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                    ABOUT LEARNING <span className="text-[#F3C556] font-normal">*</span>
+                    {siteContent.about.learningHeading} <span className="text-[#F3C556] font-normal">*</span>
                   </h2>
-                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">近期学点啥</p>
+                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.learningSubtitle}</p>
                   <p className="text-[#706A5E] leading-relaxed max-w-xl mt-2">
-                    (记录最近好奇的事情，以及我如何一步步把它们变成能力。)
+                    {siteContent.about.learningDescription}
                   </p>
                 </div>
                 <span className="font-handwriting text-4xl text-[#4A3E26] rotate-[-2deg] self-start sm:self-auto translate-y-2 select-none">
-                  What I'm Learning
+                  {siteContent.about.learningScript}
                 </span>
               </div>
 
@@ -817,13 +823,13 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
                   <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                    ABOUT GROWTH <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.45s' }}>*</span>
+                    {siteContent.about.growthHeading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.45s' }}>*</span>
                   </h2>
-                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">成长历程</p>
+                  <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.growthSubtitle}</p>
                 </div>
                 {/* Handwritten script annotation */}
                 <span className="font-handwriting text-4xl text-[#4A3E26] rotate-[3deg] self-start sm:self-auto translate-y-2 select-none">
-                  My Growth
+                  {siteContent.about.growthScript}
                 </span>
               </div>
 
@@ -860,14 +866,14 @@ export default function App() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-4 border-dashed border-[#4A3E26] pb-6">
               <div>
                 <h2 className="text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                  ABOUT WORK <span className="text-[#F3C556] font-normal">*</span>
+                  {siteContent.works.heading} <span className="text-[#F3C556] font-normal">*</span>
                 </h2>
                 <p className="text-sm md:text-base text-[#8E6D3B] tracking-wide mt-2 font-bold max-w-xl">
-                  每一份作品，都像是我在某个阶段留下的坐标，它们记录着当时的感受、思考与成长。
+                  {siteContent.works.description}
                 </p>
               </div>
               <span className="font-handwriting text-5xl text-[#4A3E26] rotate-[-3deg] select-none whitespace-nowrap self-start sm:self-auto translate-y-1">
-                Work Showcase
+                {siteContent.works.script}
               </span>
             </div>
 
@@ -1190,7 +1196,7 @@ export default function App() {
             {/* BYE BUDDY Ending visual */}
             <div className="space-y-8 pt-12 border-t-4 border-dashed border-[#4A3E26] flex flex-col items-center justify-center text-center">
               <h2 className="text-6xl md:text-7xl font-black text-[#3BB4FE] italic tracking-tight font-display">
-                Bye,buddy!
+                {siteContent.works.closingHeading}
               </h2>
 
               {/* Miniature computer graphic */}
@@ -1210,10 +1216,14 @@ export default function App() {
               </div>
 
               <div className="max-w-xl space-y-4 text-xs md:text-sm text-[#8E6D3B] leading-relaxed font-bold">
-                <p>看到这里，你已经陪我走过了我的小世界。</p>
-                <p>很感谢你愿意花时间，听我的故事、看我的作品、了解我的成长。这个网站会一直在这里，记录我未来的每一步，也期待能见证你的故事。未来的路还很长，我会继续带着热爱与真诚，慢慢走、认真走。</p>
-                <p>最后，再次谢谢你的到来。</p>
-                <p className="text-sm text-[#4A3E26] tracking-wide mt-2">愿我们都能在自己的领域里，闪闪发光；下次再见啦～</p>
+                {siteContent.works.closingParagraphs.map((paragraph, index) => (
+                  <p
+                    key={`${index}-${paragraph.slice(0, 12)}`}
+                    className={index === siteContent.works.closingParagraphs.length - 1 ? 'text-sm text-[#4A3E26] tracking-wide mt-2' : ''}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </div>
 
@@ -1229,10 +1239,10 @@ export default function App() {
               <div className="flex flex-col gap-2">
                 <div>
                   <h2 className="text-3xl md:text-4xl font-black text-[#3BB4FE] tracking-tight">
-                    生活切片 <span className="text-[#F3C556] font-normal">——</span> 把普通日子慢慢收藏
+                    {siteContent.life.heading}
                   </h2>
                   <p className="text-xs text-[#8E6D3B] mt-1 font-medium opacity-70">
-                    Collecting the days I don't want to forget.
+                    {siteContent.life.subtitle}
                   </p>
                 </div>
               </div>
@@ -1241,15 +1251,15 @@ export default function App() {
                 {/* Left block: About this corner */}
                 <div className="lg:col-span-5 bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-6 shadow-[4px_4px_0_0_#4A3E26] flex flex-col justify-between space-y-6">
                   <div>
-                    <h3 className="text-xl font-black text-[#4A3E26] border-b-2 border-[#4A3E26] pb-2 mb-4">关于这个角落</h3>
+                    <h3 className="text-xl font-black text-[#4A3E26] border-b-2 border-[#4A3E26] pb-2 mb-4">{siteContent.life.aboutTitle}</h3>
                     <div className="space-y-3">
                       <div className="flex gap-3 w-full p-2 rounded-xl">
                         <div className="w-10 h-10 shrink-0 bg-[#3BB4FE] border-2 border-[#4A3E26] rounded-xl flex items-center justify-center text-xl shadow-[1px_1px_0_0_#4A3E26]">
                           📷
                         </div>
                         <div>
-                          <h4 className="font-black text-[#4A3E26] text-sm">镜头日记</h4>
-                          <p className="text-xs text-[#8E6D3B] mt-0.5">用照片保存旅途、街景、美食和偶然遇见的风景。</p>
+                          <h4 className="font-black text-[#4A3E26] text-sm">{siteContent.life.photoTitle}</h4>
+                          <p className="text-xs text-[#8E6D3B] mt-0.5">{siteContent.life.photoDescription}</p>
                         </div>
                       </div>
                       <div className="flex gap-3 w-full p-2 rounded-xl">
@@ -1257,8 +1267,8 @@ export default function App() {
                           📝
                         </div>
                         <div>
-                          <h4 className="font-black text-[#4A3E26] text-sm">日常随笔</h4>
-                          <p className="text-xs text-[#8E6D3B] mt-0.5">记录某一天的感受、生活感悟，以及突然冒出来的小想法。</p>
+                          <h4 className="font-black text-[#4A3E26] text-sm">{siteContent.life.diaryTitle}</h4>
+                          <p className="text-xs text-[#8E6D3B] mt-0.5">{siteContent.life.diaryDescription}</p>
                         </div>
                       </div>
                       <div className="flex gap-3 w-full p-2 rounded-xl">
@@ -1266,14 +1276,14 @@ export default function App() {
                           ✨
                         </div>
                         <div>
-                          <h4 className="font-black text-[#4A3E26] text-sm">闪光时刻</h4>
-                          <p className="text-xs text-[#8E6D3B] mt-0.5">收藏值得纪念的成长、第一次尝试和生活中的小小成就。</p>
+                          <h4 className="font-black text-[#4A3E26] text-sm">{siteContent.life.momentTitle}</h4>
+                          <p className="text-xs text-[#8E6D3B] mt-0.5">{siteContent.life.momentDescription}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="bg-[#FCF9EE] border-2 border-[#4A3E26] p-3.5 rounded-xl text-center">
-                    <p className="text-xs text-[#8E6D3B] font-bold">"生活不是等待被总结的大事，而是一个个被记住的瞬间。"</p>
+                    <p className="text-xs text-[#8E6D3B] font-bold">{siteContent.life.quote}</p>
                   </div>
                 </div>
 
@@ -1378,10 +1388,10 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                   <div>
                     <h2 className="text-2xl md:text-3xl font-black text-[#3BB4FE] tracking-tight">
-                      生活图鉴
+                      {siteContent.life.galleryHeading}
                     </h2>
                     <p className="text-xs text-[#8E6D3B] mt-1 font-medium">
-                      {viewMonthFilter ? '本月的生活记录' : '一些日常，一些喜欢，一些想记住的瞬间'}
+                      {viewMonthFilter ? '本月的生活记录' : siteContent.life.gallerySubtitle}
                     </p>
                   </div>
                   {viewMonthFilter && (
@@ -1674,9 +1684,9 @@ export default function App() {
             <div className="space-y-8 pt-8 border-t-4 border-dashed border-[#4A3E26]">
               <div>
                 <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
-                  四金的留香阁 <span className="text-[#F3C556] font-normal">✦</span>
+                  {siteContent.life.guestbookHeading} <span className="text-[#F3C556] font-normal">✦</span>
                 </h2>
-                <p className="text-sm text-[#8E6D3B] tracking-wider font-bold uppercase mt-1">Leave a sweet note on the digital corkboard</p>
+                <p className="text-sm text-[#8E6D3B] tracking-wider font-bold uppercase mt-1">{siteContent.life.guestbookSubtitle}</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1804,7 +1814,7 @@ export default function App() {
                           </p>
                           <div className="flex justify-between items-center text-[9px] text-[#8E6D3B]/70 pt-1 font-mono">
                             <span>{new Date(note.createdAt).toLocaleDateString()}</span>
-                            <span>#四金的时光小屋</span>
+                            <span>{siteContent.life.guestbookTag}</span>
                           </div>
                         </div>
                       </div>
@@ -1835,10 +1845,15 @@ export default function App() {
             {/* Left side: big title + slogan */}
             <div className="flex-1">
               <h2 className="font-black text-2xl sm:text-3xl leading-tight mb-4">
-                Let's build something<br />extraordinary together.
+                {siteContent.footer.heading.split('\n').map((line, index) => (
+                  <React.Fragment key={`${index}-${line}`}>
+                    {line}
+                    {index < siteContent.footer.heading.split('\n').length - 1 && <br />}
+                  </React.Fragment>
+                ))}
               </h2>
               <p className="font-handwriting text-lg text-[#8E6D3B]">
-                一定会成为一个很棒的大人！
+                {siteContent.footer.slogan}
               </p>
             </div>
 
@@ -1877,10 +1892,22 @@ export default function App() {
 
           {/* Bottom: copyright + links */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-bold">
-            <p>© 2026 四金. All rights reserved.</p>
+            <p>{siteContent.footer.copyright}</p>
             <div className="flex gap-6">
-              <button className="hover:text-[#3BB4FE] transition-colors">Privacy Policy</button>
-              <button className="hover:text-[#3BB4FE] transition-colors">Terms of Service</button>
+              {siteContent.footer.privacyUrl ? (
+                <a href={siteContent.footer.privacyUrl} target="_blank" rel="noreferrer" className="hover:text-[#3BB4FE] transition-colors">
+                  {siteContent.footer.privacyLabel}
+                </a>
+              ) : (
+                <span>{siteContent.footer.privacyLabel}</span>
+              )}
+              {siteContent.footer.termsUrl ? (
+                <a href={siteContent.footer.termsUrl} target="_blank" rel="noreferrer" className="hover:text-[#3BB4FE] transition-colors">
+                  {siteContent.footer.termsLabel}
+                </a>
+              ) : (
+                <span>{siteContent.footer.termsLabel}</span>
+              )}
             </div>
           </div>
         </div>
