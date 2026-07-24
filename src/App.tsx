@@ -100,6 +100,12 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('sijin_active_tab', activeTab);
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [activeTab]);
 
   const navigateToAdmin = () => {
@@ -440,7 +446,7 @@ export default function App() {
     <div
       id="personal_website_container"
       style={typographyVariables}
-      className="site-typography site-copy-font min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-12"
+      className="site-typography site-copy-font min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-32 md:pb-12"
     >
       
       {/* TOP SYSTEM NAV BAR (Mustard yellow top plate styled retro block style) */}
@@ -490,9 +496,9 @@ export default function App() {
       </header>
 
       {/* MOBILE FLOATING NAV BAR */}
-      <div id="mobile_nav_container" className="md:hidden fixed bottom-4 left-4 right-4 bg-[#F3C556] border-4 border-[#4A3E26] rounded-2xl p-2 flex justify-around items-center z-50 shadow-[0_5px_0_0_#4A3E26]">
+      <div id="mobile_nav_container" className="mobile-safe-nav md:hidden fixed left-4 right-4 bg-[#F3C556] border-4 border-[#4A3E26] rounded-2xl p-2 flex justify-around items-center z-50 shadow-[0_5px_0_0_#4A3E26]">
         <button
-          onClick={() => setActiveTab('home')}
+          onClick={() => navigateToTabTop('home')}
           className={`flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition-all ${
             activeTab === 'home' ? 'bg-[#FFFDE5] text-[#3BB4FE] border-2 border-[#4A3E26] scale-105' : 'text-[#4A3E26]'
           }`}
@@ -501,7 +507,7 @@ export default function App() {
           <span className="text-[10px] font-bold">首页</span>
         </button>
         <button
-          onClick={() => setActiveTab('about')}
+          onClick={() => navigateToTabTop('about')}
           className={`flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition-all ${
             activeTab === 'about' ? 'bg-[#FFFDE5] text-[#3BB4FE] border-2 border-[#4A3E26] scale-105' : 'text-[#4A3E26]'
           }`}
@@ -510,7 +516,7 @@ export default function App() {
           <span className="text-[10px] font-bold">关于我</span>
         </button>
         <button
-          onClick={() => setActiveTab('life')}
+          onClick={() => navigateToTabTop('life')}
           className={`flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition-all ${
             activeTab === 'life' ? 'bg-[#FFFDE5] text-[#3BB4FE] border-2 border-[#4A3E26] scale-105' : 'text-[#4A3E26]'
           }`}
@@ -519,7 +525,7 @@ export default function App() {
           <span className="text-[10px] font-bold">碎片&留言</span>
         </button>
         <button
-          onClick={() => setActiveTab('works')}
+          onClick={() => navigateToTabTop('works')}
           className={`flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition-all ${
             activeTab === 'works' ? 'bg-[#FFFDE5] text-[#3BB4FE] border-2 border-[#4A3E26] scale-105' : 'text-[#4A3E26]'
           }`}
@@ -553,7 +559,7 @@ export default function App() {
               
               {/* Left Polaroid Card - Male Portrait wearing Baseball Cap */}
               <div className="lg:col-span-3 flex justify-center lg:justify-start">
-                <div className="polaroid-tilt-left bg-white border-4 border-[#7CC8F2] p-4 pb-8 w-64 md:w-72 shadow-[6px_6px_0_0_#7CC8F2] flex flex-col gap-3" style={{ marginTop: '-3cm' }}>
+                <div className="polaroid-tilt-left bg-white border-4 border-[#7CC8F2] p-4 pb-8 w-64 md:w-72 shadow-[6px_6px_0_0_#7CC8F2] flex flex-col gap-3 lg:-mt-[3cm]">
                   <div className="aspect-square bg-[#E8DFF5] border-2 border-[#4A3E26] overflow-hidden rounded">
                     <img 
                       src={siteContent.home.leftImage}
