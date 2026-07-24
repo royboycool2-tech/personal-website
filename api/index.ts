@@ -3,12 +3,6 @@ import { Redis } from '@upstash/redis';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import guestbookSeed from '../data/guestbook.json';
-import growthSeed from '../data/growth.json';
-import learningSeed from '../data/learning.json';
-import lifeFragmentsSeed from '../data/life-fragments.json';
-import skillsSeed from '../data/skills.json';
-import worksSeed from '../data/works.json';
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -485,6 +479,13 @@ async function loadCollection<T>(key: string, fallback: T[]): Promise<T[]> {
 }
 
 async function loadState(): Promise<void> {
+  const guestbookFallback = guestbookNotes;
+  const lifeFragmentsFallback = lifeFragments;
+  const worksFallback = works;
+  const skillsFallback = skills;
+  const growthFallback = growth;
+  const learningFallback = learning;
+
   [
     guestbookNotes,
     lifeFragments,
@@ -493,12 +494,12 @@ async function loadState(): Promise<void> {
     growth,
     learning,
   ] = await Promise.all([
-    loadCollection(STORAGE_KEYS.guestbook, guestbookSeed as unknown as GuestbookNote[]),
-    loadCollection(STORAGE_KEYS.lifeFragments, lifeFragmentsSeed as unknown as LifeFragment[]),
-    loadCollection(STORAGE_KEYS.works, worksSeed as unknown as Work[]),
-    loadCollection(STORAGE_KEYS.skills, skillsSeed as unknown as Skill[]),
-    loadCollection(STORAGE_KEYS.growth, growthSeed as unknown as Growth[]),
-    loadCollection(STORAGE_KEYS.learning, learningSeed as unknown as Learning[]),
+    loadCollection(STORAGE_KEYS.guestbook, guestbookFallback),
+    loadCollection(STORAGE_KEYS.lifeFragments, lifeFragmentsFallback),
+    loadCollection(STORAGE_KEYS.works, worksFallback),
+    loadCollection(STORAGE_KEYS.skills, skillsFallback),
+    loadCollection(STORAGE_KEYS.growth, growthFallback),
+    loadCollection(STORAGE_KEYS.learning, learningFallback),
   ]);
 }
 
