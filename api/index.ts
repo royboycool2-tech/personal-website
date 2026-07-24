@@ -103,13 +103,22 @@ interface Growth {
   updatedAt: string;
 }
 
+interface LearningNode {
+  id: string;
+  title: string;
+  tool: string;
+  description: string;
+  tags: string[];
+  link?: string;
+}
+
 interface Learning {
   id: string;
-  icon: string;
-  iconBgColor: string;
   title: string;
   description: string;
-  progress: number;
+  color: string;
+  status: string;
+  nodes: LearningNode[];
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -416,34 +425,81 @@ let growth: Growth[] = [
 let learning: Learning[] = [
   {
     id: 'learning-1',
-    icon: '📚',
-    iconBgColor: '#FF6B4A',
-    title: '产品设计思维',
-    description: '系统学习产品设计方法论，包括用户研究、需求分析、原型设计等核心能力。',
-    progress: 65,
+    title: 'AI 协作实践',
+    description: '把 AI 接入不同工具，探索从想法、梳理、设计到实现的完整过程。',
+    color: '#48AEEF',
+    status: '持续探索中',
+    nodes: [
+      {
+        id: 'ai-drawio',
+        title: '把逻辑画清楚',
+        tool: 'AI + draw.io',
+        description: '借助 AI 梳理业务逻辑，再将内容转化为结构清晰的流程图。',
+        tags: ['流程设计', '信息可视化']
+      },
+      {
+        id: 'ai-xmind',
+        title: '整理思考框架',
+        tool: 'AI + XMind',
+        description: '让 AI 归纳零散想法，再使用 XMind 整理成清晰的思维导图。',
+        tags: ['知识整理', '结构化思考']
+      },
+      {
+        id: 'ai-axure',
+        title: '让原型动起来',
+        tool: 'AI + Axure',
+        description: '使用 AI 分析需求、完善交互逻辑，并协助修改原型内容。',
+        tags: ['产品设计', '交互原型']
+      },
+      {
+        id: 'ai-web',
+        title: '搭建个人网页',
+        tool: 'AI + Web',
+        description: '借助 AI 完成页面策划、内容组织、视觉设计与网页实现。',
+        tags: ['网页设计', 'AI 编程']
+      }
+    ],
     sortOrder: 1,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
     id: 'learning-2',
-    icon: '🎨',
-    iconBgColor: '#3BB4FE',
-    title: 'UI视觉设计',
-    description: '提升Figma使用技能，学习色彩搭配、排版设计和组件化设计思维。',
-    progress: 40,
+    title: '语言学习',
+    description: '从「看得懂」开始，慢慢练习自然地表达自己。',
+    color: '#F29E5E',
+    status: '正在学习',
+    nodes: [
+      {
+        id: 'lang-vocab',
+        title: '建立日常词库',
+        tool: '高频表达',
+        description: '积累常用词汇和表达方式，让日常交流更加自然。',
+        tags: ['词汇积累', '日常表达']
+      },
+      {
+        id: 'lang-listening',
+        title: '听懂真实语速',
+        tool: '听力训练',
+        description: '通过真实场景听力材料，适应自然的语音语调。',
+        tags: ['听力提升', '语音识别']
+      },
+      {
+        id: 'lang-speaking',
+        title: '开始完整表达',
+        tool: '口语练习',
+        description: '从短句到完整句子，逐步建立口语表达的信心。',
+        tags: ['口语训练', '流利度']
+      },
+      {
+        id: 'lang-conversation',
+        title: '进行真实对话',
+        tool: '情景交流',
+        description: '在真实场景中练习对话，应对各种交流情境。',
+        tags: ['对话练习', '情境应用']
+      }
+    ],
     sortOrder: 2,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 'learning-3',
-    icon: '💻',
-    iconBgColor: '#3BEA72',
-    title: '前端开发基础',
-    description: '学习HTML、CSS和JavaScript基础知识，了解React框架的核心概念。',
-    progress: 25,
-    sortOrder: 3,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
@@ -474,6 +530,8 @@ const STORAGE_KEYS = {
 } as const;
 const LIFE_FRAGMENTS_SEED_VERSION_KEY = 'personal-website:life-fragments-seed-version';
 const LIFE_FRAGMENTS_SEED_VERSION = '2026-07-24-local-photos-v1';
+const LEARNING_SEED_VERSION_KEY = 'personal-website:learning-seed-version';
+const LEARNING_SEED_VERSION = '2026-07-24-theme-path-v1';
 
 async function loadCollection<T>(key: string, fallback: T[]): Promise<T[]> {
   const stored = await redis.get<T[]>(key);
@@ -495,6 +553,12 @@ async function loadState(): Promise<void> {
   if (migratedVersion !== LIFE_FRAGMENTS_SEED_VERSION) {
     await redis.set(STORAGE_KEYS.lifeFragments, lifeFragmentsFallback);
     await redis.set(LIFE_FRAGMENTS_SEED_VERSION_KEY, LIFE_FRAGMENTS_SEED_VERSION);
+  }
+
+  const learningMigratedVersion = await redis.get<string>(LEARNING_SEED_VERSION_KEY);
+  if (learningMigratedVersion !== LEARNING_SEED_VERSION) {
+    await redis.set(STORAGE_KEYS.learning, learningFallback);
+    await redis.set(LEARNING_SEED_VERSION_KEY, LEARNING_SEED_VERSION);
   }
 
   [
@@ -1185,7 +1249,7 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
 
   if (method === 'POST' && url === '/api/admin/learning') {
     authenticateAdmin(req, res, () => {
-      const { icon, iconBgColor, title, description, progress, sortOrder } = req.body as any;
+      const { title, description, color, status, nodes, sortOrder } = req.body as any;
 
       if (!title) {
         return res.status(400).json({ error: '标题为必填项' });
@@ -1193,11 +1257,20 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
 
       const newLearning: Learning = {
         id: `learning-${Date.now()}`,
-        icon: icon || '📚',
-        iconBgColor: iconBgColor || '#FF6B4A',
         title: String(title),
         description: description || '',
-        progress: progress || 0,
+        color: color || '#48AEEF',
+        status: status || '持续探索中',
+        nodes: Array.isArray(nodes)
+          ? nodes.map((node: any, index: number) => ({
+              id: node.id || `learning-node-${Date.now()}-${index}`,
+              title: String(node.title || ''),
+              tool: String(node.tool || ''),
+              description: String(node.description || ''),
+              tags: Array.isArray(node.tags) ? node.tags.map(String) : [],
+              link: node.link ? String(node.link) : undefined,
+            }))
+          : [],
         sortOrder: sortOrder || learning.length + 1,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -1219,15 +1292,24 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
         return res.status(404).json({ error: '学习计划不存在' });
       }
 
-      const { icon, iconBgColor, title, description, progress, sortOrder } = req.body as any;
+      const { title, description, color, status, nodes, sortOrder } = req.body as any;
 
       learning[index] = {
         ...learning[index],
-        icon: icon !== undefined ? String(icon) : learning[index].icon,
-        iconBgColor: iconBgColor !== undefined ? String(iconBgColor) : learning[index].iconBgColor,
         title: title !== undefined ? String(title) : learning[index].title,
         description: description !== undefined ? String(description) : learning[index].description,
-        progress: progress !== undefined ? Number(progress) : learning[index].progress,
+        color: color !== undefined ? String(color) : learning[index].color,
+        status: status !== undefined ? String(status) : learning[index].status,
+        nodes: Array.isArray(nodes)
+          ? nodes.map((node: any, nodeIndex: number) => ({
+              id: node.id || `learning-node-${Date.now()}-${nodeIndex}`,
+              title: String(node.title || ''),
+              tool: String(node.tool || ''),
+              description: String(node.description || ''),
+              tags: Array.isArray(node.tags) ? node.tags.map(String) : [],
+              link: node.link ? String(node.link) : undefined,
+            }))
+          : learning[index].nodes,
         sortOrder: sortOrder !== undefined ? Number(sortOrder) : learning[index].sortOrder,
         updatedAt: new Date().toISOString()
       };

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
-import ThemePath, { ThemePathNode } from './components/ThemePath';
+import ThemePath from './components/ThemePath';
 import { authService, apiService, StatsSummary, Work, Skill, Growth, Learning } from './services/api';
 
 // Define Interface for Sticky Notes
@@ -796,86 +796,19 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-8">
-                <div className="flex-1">
-                  <ThemePath
-                    id={1}
-                    title="AI 协作实践"
-                    description="把 AI 接入不同工具，探索从想法、梳理、设计到实现的完整过程。"
-                    color="#48AEEF"
-                    status="持续探索中"
-                    nodes={[
-                      {
-                        id: 'ai-drawio',
-                        title: '把逻辑画清楚',
-                        tool: 'AI + draw.io',
-                        description: '借助 AI 梳理业务逻辑，再将内容转化为结构清晰的流程图。',
-                        tags: ['流程设计', '信息可视化']
-                      },
-                      {
-                        id: 'ai-xmind',
-                        title: '整理思考框架',
-                        tool: 'AI + XMind',
-                        description: '让 AI 归纳零散想法，再使用 XMind 整理成清晰的思维导图。',
-                        tags: ['知识整理', '结构化思考']
-                      },
-                      {
-                        id: 'ai-axure',
-                        title: '让原型动起来',
-                        tool: 'AI + Axure',
-                        description: '使用 AI 分析需求、完善交互逻辑，并协助修改原型内容。',
-                        tags: ['产品设计', '交互原型']
-                      },
-                      {
-                        id: 'ai-web',
-                        title: '搭建个人网页',
-                        tool: 'AI + Web',
-                        description: '借助 AI 完成页面策划、内容组织、视觉设计与网页实现。',
-                        tags: ['网页设计', 'AI 编程']
-                      }
-                    ]}
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <ThemePath
-                    id={2}
-                    title="语言学习"
-                    description="从「看得懂」开始，慢慢练习自然地表达自己。"
-                    color="#F29E5E"
-                    status="正在学习"
-                    nodes={[
-                      {
-                        id: 'lang-vocab',
-                        title: '建立日常词库',
-                        tool: '高频表达',
-                        description: '积累常用词汇和表达方式，让日常交流更加自然。',
-                        tags: ['词汇积累', '日常表达']
-                      },
-                      {
-                        id: 'lang-listening',
-                        title: '听懂真实语速',
-                        tool: '听力训练',
-                        description: '通过真实场景听力材料，适应自然的语音语调。',
-                        tags: ['听力提升', '语音识别']
-                      },
-                      {
-                        id: 'lang-speaking',
-                        title: '开始完整表达',
-                        tool: '口语练习',
-                        description: '从短句到完整句子，逐步建立口语表达的信心。',
-                        tags: ['口语训练', '流利度']
-                      },
-                      {
-                        id: 'lang-conversation',
-                        title: '进行真实对话',
-                        tool: '情景交流',
-                        description: '在真实场景中练习对话，应对各种交流情境。',
-                        tags: ['对话练习', '情境应用']
-                      }
-                    ]}
-                  />
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {learningItems.map((learning, index) => (
+                  <div key={learning.id}>
+                    <ThemePath
+                      id={learning.sortOrder || index + 1}
+                      title={learning.title}
+                      description={learning.description}
+                      color={learning.color}
+                      status={learning.status}
+                      nodes={learning.nodes}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 

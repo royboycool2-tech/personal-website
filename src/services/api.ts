@@ -134,13 +134,22 @@ export interface Growth {
   updatedAt?: string;
 }
 
+export interface LearningNode {
+  id: string;
+  title: string;
+  tool: string;
+  description: string;
+  tags: string[];
+  link?: string;
+}
+
 export interface Learning {
   id: string;
-  icon: string;
-  iconBgColor: string;
   title: string;
   description: string;
-  progress: number;
+  color: string;
+  status: string;
+  nodes: LearningNode[];
   sortOrder: number;
   createdAt?: string;
   updatedAt?: string;

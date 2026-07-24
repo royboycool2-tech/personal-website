@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Eye, EyeOff, LogOut, Save, X, Image as ImageIcon, Calendar, MapPin, Tag, MessageSquare, Bookmark, Palette, User } from 'lucide-react';
-import { authService, apiService, LifeFragment, GuestbookNote, Work, Skill, Growth, Learning } from '../services/api';
+import { authService, apiService, LifeFragment, GuestbookNote, Work, Skill, Growth, Learning, LearningNode } from '../services/api';
+import ThemePath from './ThemePath';
 
 const PROJECT_TYPE_OPTIONS = [
   { value: 'app', label: 'APP 设计' },
@@ -12,6 +13,24 @@ const PROJECT_TYPE_OPTIONS = [
 interface AdminPanelProps {
   onLogout: () => void;
 }
+
+interface LearningFormData {
+  title: string;
+  description: string;
+  color: string;
+  status: string;
+  nodes: LearningNode[];
+  sortOrder: number;
+}
+
+const createEmptyLearningNode = (): LearningNode => ({
+  id: `learning-node-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  title: '',
+  tool: '',
+  description: '',
+  tags: [],
+  link: '',
+});
 
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'fragments' | 'guestbook' | 'works' | 'about'>(() => {
@@ -110,12 +129,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [isLoadingLearning, setIsLoadingLearning] = useState(false);
   const [showLearningForm, setShowLearningForm] = useState(false);
   const [editingLearning, setEditingLearning] = useState<Learning | null>(null);
-  const [learningFormData, setLearningFormData] = useState({
-    icon: '📚',
-    iconBgColor: '#FF6B4A',
+  const [learningFormData, setLearningFormData] = useState<LearningFormData>({
     title: '',
     description: '',
-    progress: 0,
+    color: '#48AEEF',
+    status: '持续探索中',
+    nodes: [createEmptyLearningNode()],
     sortOrder: 0
   });
 
@@ -764,11 +783,11 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const resetLearningForm = () => {
     setLearningFormData({
-      icon: '📚',
-      iconBgColor: '#FF6B4A',
       title: '',
       description: '',
-      progress: 0,
+      color: '#48AEEF',
+      status: '持续探索中',
+      nodes: [createEmptyLearningNode()],
       sortOrder: learningItems.length + 1
     });
     setEditingLearning(null);
@@ -782,11 +801,15 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const openEditLearningForm = (learning: Learning) => {
     setLearningFormData({
-      icon: learning.icon,
-      iconBgColor: learning.iconBgColor,
       title: learning.title,
       description: learning.description,
-      progress: learning.progress,
+      color: learning.color,
+      status: learning.status,
+      nodes: learning.nodes.map(node => ({
+        ...node,
+        tags: [...node.tags],
+        link: node.link || '',
+      })),
       sortOrder: learning.sortOrder
     });
     setEditingLearning(learning);
@@ -797,13 +820,30 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     e.preventDefault();
     if (!learningFormData.title.trim()) return;
 
+    const payload: LearningFormData = {
+      ...learningFormData,
+      title: learningFormData.title.trim(),
+      description: learningFormData.description.trim(),
+      status: learningFormData.status.trim() || '持续探索中',
+      nodes: learningFormData.nodes
+        .filter(node => node.title.trim())
+        .map(node => ({
+          ...node,
+          title: node.title.trim(),
+          tool: node.tool.trim(),
+          description: node.description.trim(),
+          tags: node.tags.map(tag => tag.trim()).filter(Boolean),
+          link: node.link?.trim() || undefined,
+        })),
+    };
+
     setIsSaving(true);
     try {
       if (editingLearning) {
-        await apiService.updateLearning(editingLearning.id, learningFormData);
+        await apiService.updateLearning(editingLearning.id, payload);
         showMessage('success', '学习计划更新成功');
       } else {
-        await apiService.createLearning(learningFormData);
+        await apiService.createLearning(payload);
         showMessage('success', '学习计划创建成功');
       }
       await loadLearning();
@@ -813,6 +853,39 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const updateLearningNode = (index: number, updates: Partial<LearningNode>) => {
+    setLearningFormData(prev => ({
+      ...prev,
+      nodes: prev.nodes.map((node, nodeIndex) =>
+        nodeIndex === index ? { ...node, ...updates } : node
+      ),
+    }));
+  };
+
+  const addLearningNode = () => {
+    setLearningFormData(prev => ({
+      ...prev,
+      nodes: [...prev.nodes, createEmptyLearningNode()],
+    }));
+  };
+
+  const removeLearningNode = (index: number) => {
+    setLearningFormData(prev => ({
+      ...prev,
+      nodes: prev.nodes.filter((_, nodeIndex) => nodeIndex !== index),
+    }));
+  };
+
+  const moveLearningNode = (index: number, direction: -1 | 1) => {
+    setLearningFormData(prev => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= prev.nodes.length) return prev;
+      const nodes = [...prev.nodes];
+      [nodes[index], nodes[targetIndex]] = [nodes[targetIndex], nodes[index]];
+      return { ...prev, nodes };
+    });
   };
 
   const handleDeleteLearning = async (id: string) => {
@@ -2615,7 +2688,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             )}
 
             {showLearningForm && (
-              <div className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-6 shadow-[6px_6px_0_0_#4A3E26] mb-8">
+              <div className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-5 md:p-7 shadow-[6px_6px_0_0_#4A3E26] mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-black text-[#4A3E26]">
                     {editingLearning ? '✏️ 编辑学习计划' : '✨ 新增学习计划'}
@@ -2629,75 +2702,167 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </button>
                 </div>
 
-                <form onSubmit={handleLearningSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">图标</label>
-                      <input
-                        type="text"
-                        value={learningFormData.icon}
-                        onChange={(e) => setLearningFormData(prev => ({ ...prev, icon: e.target.value }))}
-                        placeholder="例如：📚"
-                        className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-                      />
+                <form onSubmit={handleLearningSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] gap-7 items-start">
+                    <div className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">卡片标题 *</label>
+                          <input
+                            type="text"
+                            value={learningFormData.title}
+                            onChange={(e) => setLearningFormData(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="例如：AI 协作实践"
+                            className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">底部状态</label>
+                          <input
+                            type="text"
+                            value={learningFormData.status}
+                            onChange={(e) => setLearningFormData(prev => ({ ...prev, status: e.target.value }))}
+                            placeholder="例如：持续探索中"
+                            className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">卡片简介</label>
+                        <textarea
+                          value={learningFormData.description}
+                          onChange={(e) => setLearningFormData(prev => ({ ...prev, description: e.target.value }))}
+                          placeholder="概括这一组学习计划..."
+                          rows={3}
+                          className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE] resize-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">主题颜色</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={learningFormData.color}
+                              onChange={(e) => setLearningFormData(prev => ({ ...prev, color: e.target.value }))}
+                              className="w-14 bg-white border-2 border-[#4A3E26] p-1 rounded-xl cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={learningFormData.color}
+                              onChange={(e) => setLearningFormData(prev => ({ ...prev, color: e.target.value }))}
+                              className="min-w-0 flex-1 bg-white border-2 border-[#4A3E26] px-3 py-2.5 rounded-xl text-sm font-mono font-bold text-[#4A3E26]"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">卡片编号 / 排序</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={learningFormData.sortOrder}
+                            onChange={(e) => setLearningFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 1 }))}
+                            className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#3BB4FE]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <div className="flex items-center justify-between gap-3 mb-3">
+                          <div>
+                            <h4 className="font-black text-[#4A3E26]">学习任务清单</h4>
+                            <p className="text-xs text-[#8E6D3B] font-bold">每一项对应首页卡片中的一个圆点任务</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={addLearningNode}
+                            className="shrink-0 bg-[#D4F0FC] hover:bg-[#bfe9fb] border-2 border-[#4A3E26] text-[#4A3E26] font-black px-3 py-2 rounded-xl shadow-[2px_2px_0_0_#4A3E26] text-xs flex items-center gap-1"
+                          >
+                            <Plus className="w-4 h-4" />
+                            添加任务
+                          </button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {learningFormData.nodes.map((node, index) => (
+                            <div key={node.id} className="bg-white border-2 border-[#4A3E26] rounded-2xl p-4 shadow-[2px_2px_0_0_#4A3E26]">
+                              <div className="flex items-center justify-between gap-3 mb-3">
+                                <span className="text-xs font-black px-2 py-1 rounded-full" style={{ backgroundColor: `${learningFormData.color}25`, color: learningFormData.color }}>
+                                  任务 {String(index + 1).padStart(2, '0')}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <button type="button" onClick={() => moveLearningNode(index, -1)} disabled={index === 0} className="px-2 py-1 text-xs font-black rounded-lg hover:bg-[#D4F0FC] disabled:opacity-30">↑</button>
+                                  <button type="button" onClick={() => moveLearningNode(index, 1)} disabled={index === learningFormData.nodes.length - 1} className="px-2 py-1 text-xs font-black rounded-lg hover:bg-[#D4F0FC] disabled:opacity-30">↓</button>
+                                  <button type="button" onClick={() => removeLearningNode(index)} className="p-1.5 rounded-lg hover:bg-red-100" title="删除任务">
+                                    <Trash2 className="w-4 h-4 text-[#FF6B4A]" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <input
+                                  type="text"
+                                  value={node.title}
+                                  onChange={(e) => updateLearningNode(index, { title: e.target.value })}
+                                  placeholder="任务标题，例如：把逻辑画清楚"
+                                  className="bg-[#FCF9EE] border-2 border-[#4A3E26]/60 px-3 py-2 rounded-xl text-sm font-bold text-[#4A3E26]"
+                                />
+                                <input
+                                  type="text"
+                                  value={node.tool}
+                                  onChange={(e) => updateLearningNode(index, { tool: e.target.value })}
+                                  placeholder="简短说明，例如：AI + draw.io"
+                                  className="bg-[#FCF9EE] border-2 border-[#4A3E26]/60 px-3 py-2 rounded-xl text-sm font-bold"
+                                  style={{ color: learningFormData.color }}
+                                />
+                              </div>
+
+                              <textarea
+                                value={node.description}
+                                onChange={(e) => updateLearningNode(index, { description: e.target.value })}
+                                placeholder="展开任务时显示的详细说明..."
+                                rows={2}
+                                className="w-full mt-3 bg-[#FCF9EE] border-2 border-[#4A3E26]/60 px-3 py-2 rounded-xl text-sm text-[#4A3E26] resize-none"
+                              />
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                                <input
+                                  type="text"
+                                  value={node.tags.join(', ')}
+                                  onChange={(e) => updateLearningNode(index, { tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean) })}
+                                  placeholder="标签，用英文逗号分隔"
+                                  className="bg-[#FCF9EE] border-2 border-[#4A3E26]/60 px-3 py-2 rounded-xl text-xs font-bold text-[#4A3E26]"
+                                />
+                                <input
+                                  type="url"
+                                  value={node.link || ''}
+                                  onChange={(e) => updateLearningNode(index, { link: e.target.value })}
+                                  placeholder="相关链接（可选）"
+                                  className="bg-[#FCF9EE] border-2 border-[#4A3E26]/60 px-3 py-2 rounded-xl text-xs font-bold text-[#4A3E26]"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">图标背景色</label>
-                      <input
-                        type="color"
-                        value={learningFormData.iconBgColor}
-                        onChange={(e) => setLearningFormData(prev => ({ ...prev, iconBgColor: e.target.value }))}
-                        className="w-full bg-white border-2 border-[#4A3E26] px-2 py-1 rounded-xl cursor-pointer"
+
+                    <div className="xl:sticky xl:top-28">
+                      <p className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider mb-3">首页效果实时预览</p>
+                      <ThemePath
+                        id={learningFormData.sortOrder || 1}
+                        title={learningFormData.title || '学习计划标题'}
+                        description={learningFormData.description || '这里会显示这张卡片的简介。'}
+                        color={learningFormData.color}
+                        status={learningFormData.status || '持续探索中'}
+                        nodes={learningFormData.nodes.filter(node => node.title.trim())}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">学习进度 (%)</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={learningFormData.progress}
-                        onChange={(e) => setLearningFormData(prev => ({ ...prev, progress: parseInt(e.target.value) || 0 }))}
-                        className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">排序</label>
-                      <input
-                        type="number"
-                        value={learningFormData.sortOrder}
-                        onChange={(e) => setLearningFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 0 }))}
-                        className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">标题 *</label>
-                    <input
-                      type="text"
-                      value={learningFormData.title}
-                      onChange={(e) => setLearningFormData(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="例如：产品设计思维"
-                      className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-black text-[#8E6D3B] uppercase tracking-wider">描述</label>
-                    <textarea
-                      value={learningFormData.description}
-                      onChange={(e) => setLearningFormData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="详细描述这个学习计划..."
-                      rows={4}
-                      className="w-full bg-white border-2 border-[#4A3E26] px-4 py-2.5 rounded-xl text-sm font-bold text-[#4A3E26] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A] resize-none"
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-4 pt-4">
+                  <div className="flex justify-end gap-4 pt-5 border-t-2 border-dashed border-[#4A3E26]/20">
                     <button
                       type="button"
                       onClick={resetLearningForm}
@@ -2719,50 +2884,36 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             )}
 
             {!showLearningForm && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
                 {learningItems.map(learning => (
                   <div
                     key={learning.id}
-                    className="bg-[#FFFDE5] border-4 border-[#4A3E26] rounded-[2rem] p-6 shadow-[4px_4px_0_0_#4A3E26]"
+                    className="flex flex-col gap-3"
                   >
-                    <div
-                      className="w-12 h-12 rounded-2xl border-2 border-[#4A3E26] flex items-center justify-center text-2xl shadow-[2px_2px_0_0_#4A3E26]"
-                      style={{ backgroundColor: learning.iconBgColor }}
-                    >
-                      {learning.icon}
-                    </div>
-                    <h3 className="text-xl font-black text-[#4A3E26] mt-4 mb-2">{learning.title}</h3>
-                    <p className="text-sm text-[#665B45] leading-relaxed mb-4">{learning.description}</p>
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-[#8E6D3B] uppercase">学习进度</span>
-                        <span className="text-xs font-black text-[#4A3E26]">{learning.progress}%</span>
-                      </div>
-                      <div className="w-full h-3 bg-[#FCF9EE] border-2 border-[#4A3E26] rounded-full overflow-hidden">
-                        <div
-                          className="h-full"
-                          style={{
-                            width: `${learning.progress}%`,
-                            backgroundColor: learning.iconBgColor
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-dashed border-[#4A3E26]/20">
-                      <span className="text-xs font-bold text-[#8E6D3B]">排序: #{learning.sortOrder}</span>
-                      <div className="flex items-center gap-1">
+                    <ThemePath
+                      id={learning.sortOrder}
+                      title={learning.title}
+                      description={learning.description}
+                      color={learning.color}
+                      status={learning.status}
+                      nodes={learning.nodes}
+                    />
+                    <div className="flex items-center justify-between bg-white border-2 border-[#4A3E26] rounded-xl px-4 py-2 shadow-[2px_2px_0_0_#4A3E26]">
+                      <span className="text-xs font-bold text-[#8E6D3B]">{learning.nodes.length} 个任务 · 排序 #{learning.sortOrder}</span>
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => openEditLearningForm(learning)}
-                          className="p-1.5 hover:bg-[#D4F0FC] rounded-lg transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4F0FC] hover:bg-[#bfe9fb] border-2 border-[#4A3E26] rounded-lg text-xs font-black text-[#4A3E26]"
                           title="编辑"
                         >
                           <Edit2 className="w-4 h-4 text-[#3BB4FE]" />
+                          编辑
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteLearning(learning.id)}
-                          className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-red-100 border-2 border-transparent hover:border-[#4A3E26] rounded-lg transition-colors"
                           title="删除"
                         >
                           <Trash2 className="w-4 h-4 text-[#FF6B4A]" />
