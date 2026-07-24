@@ -140,6 +140,54 @@
   line-height: 1.5 !important;
 }
 
+/*
+ * Chinese reading copy uses a clean system sans style. Latin characters keep
+ * Plus Jakarta Sans, while headings retain the original display treatment.
+ */
+.site-typography.site-copy-font,
+.site-typography .site-copy-font {
+  font-family: 'Plus Jakarta Sans', 'Microsoft YaHei', 'PingFang SC',
+    'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif;
+  font-style: normal;
+}
+
+.site-typography.site-copy-font h1,
+.site-typography.site-copy-font h2,
+.site-typography.site-copy-font h3,
+.site-typography.site-copy-font h4,
+.site-typography .site-copy-font h1,
+.site-typography .site-copy-font h2,
+.site-typography .site-copy-font h3,
+.site-typography .site-copy-font h4 {
+  font-family: 'Plus Jakarta Sans', 'ZCOOL KuaiLe', sans-serif;
+}
+
+/* Every marked red-box text role is exactly four pixels larger. */
+.site-typography .site-red-copy h3,
+.site-typography .site-red-copy h4,
+.site-typography .site-red-copy .text-xl,
+.site-typography .site-red-copy .text-2xl {
+  font-size: calc(var(--site-heading-size, 22px) + 4px) !important;
+}
+
+.site-typography .site-red-copy p:not(.text-xs),
+.site-typography .site-red-copy .text-sm,
+.site-typography .site-red-copy .text-base,
+.site-typography .site-red-copy .text-lg,
+.site-typography .site-red-copy.text-sm,
+.site-typography .site-red-copy.text-base,
+.site-typography .site-red-copy.text-lg {
+  font-size: calc(var(--site-body-size, 16px) + 4px) !important;
+  line-height: 1.75 !important;
+}
+
+.site-typography .site-red-copy .text-xs,
+.site-typography .site-red-copy [class*="text-[10px]"],
+.site-typography .site-red-copy [class*="text-[9px]"] {
+  font-size: calc(var(--site-helper-size, 13px) + 4px) !important;
+  line-height: 1.6 !important;
+}
+
 @media (max-width: 640px) {
   .site-typography {
     font-size: var(--site-mobile-body-size, 16px);
@@ -196,5 +244,28 @@
   .site-typography .site-page [class*="text-[9px]"],
   .site-typography .site-dynamic-card .text-xs {
     font-size: var(--site-mobile-helper-size, 13px) !important;
+  }
+
+  .site-typography .site-red-copy h3,
+  .site-typography .site-red-copy h4,
+  .site-typography .site-red-copy .text-xl,
+  .site-typography .site-red-copy .text-2xl {
+    font-size: calc(var(--site-mobile-heading-size, 20px) + 4px) !important;
+  }
+
+  .site-typography .site-red-copy p:not(.text-xs),
+  .site-typography .site-red-copy .text-sm,
+  .site-typography .site-red-copy .text-base,
+  .site-typography .site-red-copy .text-lg,
+  .site-typography .site-red-copy.text-sm,
+  .site-typography .site-red-copy.text-base,
+  .site-typography .site-red-copy.text-lg {
+    font-size: calc(var(--site-mobile-body-size, 16px) + 4px) !important;
+  }
+
+  .site-typography .site-red-copy .text-xs,
+  .site-typography .site-red-copy [class*="text-[10px]"],
+  .site-typography .site-red-copy [class*="text-[9px]"] {
+    font-size: calc(var(--site-mobile-helper-size, 13px) + 4px) !important;
   }
 }
