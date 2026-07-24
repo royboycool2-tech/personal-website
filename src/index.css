@@ -78,7 +78,13 @@
  * visitor-facing website so the admin console always remains easy to use.
  */
 .site-typography {
+  font-size: var(--site-body-size, 16px);
   font-weight: var(--site-body-weight, 500);
+}
+
+.site-typography .site-hero-title {
+  font-size: var(--site-hero-size, 72px);
+  font-weight: var(--site-display-weight, 900);
 }
 
 .site-typography .font-black {
@@ -96,12 +102,38 @@
 }
 
 .site-typography .site-display-title {
+  font-size: var(--site-display-size, 42px);
   font-weight: var(--site-display-weight, 900);
+}
+
+.site-typography h2:not(.site-display-title),
+.site-typography h3,
+.site-typography h4 {
+  font-size: var(--site-heading-size, 22px);
+}
+
+.site-typography .text-sm,
+.site-typography .text-base {
+  font-size: var(--site-body-size, 16px);
+  line-height: 1.7;
+}
+
+.site-typography .text-xs,
+.site-typography [class*="text-[10px]"],
+.site-typography [class*="text-[9px]"] {
+  font-size: var(--site-helper-size, 13px);
+  line-height: 1.5;
 }
 
 @media (max-width: 640px) {
   .site-typography {
+    font-size: var(--site-mobile-body-size, 16px);
     font-weight: var(--site-mobile-body-weight, 400);
+  }
+
+  .site-typography .site-hero-title {
+    font-size: var(--site-mobile-hero-size, 52px);
+    font-weight: var(--site-mobile-display-weight, 800);
   }
 
   .site-typography .font-black {
@@ -119,6 +151,24 @@
   }
 
   .site-typography .site-display-title {
+    font-size: var(--site-mobile-display-size, 34px);
     font-weight: var(--site-mobile-display-weight, 800);
+  }
+
+  .site-typography h2:not(.site-display-title),
+  .site-typography h3,
+  .site-typography h4 {
+    font-size: var(--site-mobile-heading-size, 20px);
+  }
+
+  .site-typography .text-sm,
+  .site-typography .text-base {
+    font-size: var(--site-mobile-body-size, 16px);
+  }
+
+  .site-typography .text-xs,
+  .site-typography [class*="text-[10px]"],
+  .site-typography [class*="text-[9px]"] {
+    font-size: var(--site-mobile-helper-size, 13px);
   }
 }
