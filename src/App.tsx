@@ -390,8 +390,8 @@ export default function App() {
     '--site-heading-size': `${siteContent.typography.headingSize}px`,
     '--site-body-size': `${siteContent.typography.bodySize}px`,
     '--site-helper-size': `${siteContent.typography.helperSize}px`,
-    '--site-mobile-hero-size': `${Math.max(40, Math.round(siteContent.typography.heroSize * 0.72))}px`,
-    '--site-mobile-display-size': `${Math.max(28, Math.round(siteContent.typography.displaySize * 0.8))}px`,
+    '--site-mobile-hero-size': `${Math.min(64, Math.max(40, Math.round(siteContent.typography.heroSize * 0.58)))}px`,
+    '--site-mobile-display-size': `${Math.min(48, Math.max(28, Math.round(siteContent.typography.displaySize * 0.68)))}px`,
     '--site-mobile-heading-size': `${Math.max(18, Math.round(siteContent.typography.headingSize * 0.9))}px`,
     '--site-mobile-body-size': `${siteContent.typography.bodySize}px`,
     '--site-mobile-helper-size': `${siteContent.typography.helperSize}px`,
@@ -523,9 +523,9 @@ export default function App() {
 
         {/* ----------------- TAB 1: HOME (首页) ----------------- */}
         {activeTab === 'home' && (
-          <div id="home_tab_view" data-site-page="home" className="site-page site-page-home space-y-12 animate-fadeIn">
+          <div id="home_tab_view" data-site-page="home" className="site-page site-page-home space-y-4 animate-fadeIn">
             {/* Display Big Bold Heading - Hey,buddy! */}
-            <div className="relative text-center py-4">
+            <div className="relative text-center pt-1 pb-0">
               <h1 className="site-hero-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
                 {siteContent.home.heroTitle}
               </h1>
@@ -538,7 +538,7 @@ export default function App() {
             </div>
 
             {/* Visual Bento Arrangement (Screenshot 1 setup) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-0">
               
               {/* Left Polaroid Card - Male Portrait wearing Baseball Cap */}
               <div className="lg:col-span-3 flex justify-center lg:justify-start">
@@ -557,7 +557,7 @@ export default function App() {
               </div>
 
               {/* Center Hand-Drawn Retro Monitor and Keyboard */}
-              <div className="lg:col-span-6 flex flex-col items-center justify-center">
+              <div className="-mt-2 lg:-mt-8 lg:col-span-6 flex flex-col items-center justify-center">
                 
                 {/* Hand-Drawn CRT Monitor Outer Shield */}
                 <div className="relative w-80 sm:w-96 bg-[#F3C556] border-4 border-[#4A3E26] rounded-[3rem] p-6 shadow-[8px_8px_0_0_#4A3E26] flex flex-col gap-4">
