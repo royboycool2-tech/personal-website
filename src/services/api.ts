@@ -222,6 +222,13 @@ export interface SiteContent {
     guestbookSubtitle: string;
     guestbookTag: string;
   };
+  typography: {
+    displayWeight: number;
+    headingWeight: number;
+    bodyWeight: number;
+    helperWeight: number;
+    mobileAutoLighten: boolean;
+  };
   footer: {
     heading: string;
     slogan: string;
@@ -310,6 +317,13 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     guestbookHeading: '四金的留香阁',
     guestbookSubtitle: 'Leave a sweet note on the digital corkboard',
     guestbookTag: '#四金的时光小屋',
+  },
+  typography: {
+    displayWeight: 900,
+    headingWeight: 800,
+    bodyWeight: 500,
+    helperWeight: 700,
+    mobileAutoLighten: true,
   },
   footer: {
     heading: "Let's build something\nextraordinary together.",
