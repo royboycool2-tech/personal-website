@@ -90,6 +90,8 @@
 .site-typography .site-hero-title {
   font-size: var(--site-hero-size, 72px) !important;
   font-weight: var(--site-display-weight, 900) !important;
+  line-height: 0.92 !important;
+  letter-spacing: -0.035em;
 }
 
 .site-typography .font-black {
@@ -109,6 +111,8 @@
 .site-typography .site-display-title {
   font-size: var(--site-display-size, 42px) !important;
   font-weight: var(--site-display-weight, 900) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.025em;
 }
 
 .site-typography .site-page h2:not(.site-display-title),
