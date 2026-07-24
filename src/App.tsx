@@ -882,7 +882,7 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className={`grid grid-cols-1 gap-8 ${learningItems.length > 1 ? 'lg:grid-cols-2' : ''}`}>
                 {learningItems.map((learning, index) => (
                   <div key={learning.id}>
                     <ThemePath
