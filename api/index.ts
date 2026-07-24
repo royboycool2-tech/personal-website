@@ -192,6 +192,11 @@ interface SiteContent {
     guestbookTag: string;
   };
   typography: {
+    heroSize: number;
+    displaySize: number;
+    headingSize: number;
+    bodySize: number;
+    helperSize: number;
     displayWeight: number;
     headingWeight: number;
     bodyWeight: number;
@@ -669,11 +674,16 @@ let siteContent: SiteContent = {
     guestbookTag: '#四金的时光小屋',
   },
   typography: {
-    displayWeight: 900,
-    headingWeight: 800,
-    bodyWeight: 500,
-    helperWeight: 700,
-    mobileAutoLighten: true,
+    heroSize: 72,
+    displaySize: 42,
+    headingSize: 22,
+    bodySize: 16,
+    helperSize: 13,
+    displayWeight: 700,
+    headingWeight: 600,
+    bodyWeight: 400,
+    helperWeight: 500,
+    mobileAutoLighten: false,
   },
   footer: {
     heading: "Let's build something\nextraordinary together.",
@@ -880,6 +890,11 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
       typography: {
         ...siteContent.typography,
         ...(incoming.typography || {}),
+        heroSize: Math.min(120, Math.max(32, Number(incoming.typography?.heroSize ?? siteContent.typography.heroSize))),
+        displaySize: Math.min(72, Math.max(24, Number(incoming.typography?.displaySize ?? siteContent.typography.displaySize))),
+        headingSize: Math.min(40, Math.max(16, Number(incoming.typography?.headingSize ?? siteContent.typography.headingSize))),
+        bodySize: Math.min(24, Math.max(14, Number(incoming.typography?.bodySize ?? siteContent.typography.bodySize))),
+        helperSize: Math.min(20, Math.max(11, Number(incoming.typography?.helperSize ?? siteContent.typography.helperSize))),
         displayWeight: Math.min(900, Math.max(100, Number(incoming.typography?.displayWeight ?? siteContent.typography.displayWeight))),
         headingWeight: Math.min(900, Math.max(100, Number(incoming.typography?.headingWeight ?? siteContent.typography.headingWeight))),
         bodyWeight: Math.min(900, Math.max(100, Number(incoming.typography?.bodyWeight ?? siteContent.typography.bodyWeight))),
