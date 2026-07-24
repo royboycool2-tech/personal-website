@@ -383,6 +383,18 @@ export default function App() {
     });
   };
 
+  const mobileWeightReduction = siteContent.typography.mobileAutoLighten ? 100 : 0;
+  const typographyVariables = {
+    '--site-display-weight': siteContent.typography.displayWeight,
+    '--site-heading-weight': siteContent.typography.headingWeight,
+    '--site-body-weight': siteContent.typography.bodyWeight,
+    '--site-helper-weight': siteContent.typography.helperWeight,
+    '--site-mobile-display-weight': Math.max(100, siteContent.typography.displayWeight - mobileWeightReduction),
+    '--site-mobile-heading-weight': Math.max(100, siteContent.typography.headingWeight - mobileWeightReduction),
+    '--site-mobile-body-weight': Math.max(100, siteContent.typography.bodyWeight - mobileWeightReduction),
+    '--site-mobile-helper-weight': Math.max(100, siteContent.typography.helperWeight - mobileWeightReduction),
+  } as React.CSSProperties;
+
   if (isAdminRoute) {
     if (isAdminVerified || authService.isLoggedIn()) {
       return (
@@ -404,7 +416,11 @@ export default function App() {
   }
 
   return (
-    <div id="personal_website_container" className="min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-12">
+    <div
+      id="personal_website_container"
+      style={typographyVariables}
+      className="site-typography min-h-screen bg-[#FCF9EE] text-[#4A3E26] font-display selection:bg-[#3BB4FE] selection:text-white flex flex-col justify-between overflow-x-hidden pb-12"
+    >
       
       {/* TOP SYSTEM NAV BAR (Mustard yellow top plate styled retro block style) */}
       <header id="website_header" className="bg-[#F3C556] border-b-4 border-[#4A3E26] px-4 py-3 flex items-center gap-4 shadow-[0_4px_0_0_#4A3E26] sticky top-0 z-50">
@@ -500,7 +516,7 @@ export default function App() {
           <div id="home_tab_view" className="space-y-12 animate-fadeIn">
             {/* Display Big Bold Heading - Hey,buddy! */}
             <div className="relative text-center py-4">
-              <h1 className="text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
+              <h1 className="site-display-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
                 {siteContent.home.heroTitle}
               </h1>
               {/* Spiky Blue badge overlay */}
@@ -696,7 +712,7 @@ export default function App() {
               
               <div className="md:col-span-7 space-y-6">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                  <h2 className="site-display-title text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
                     {siteContent.about.heading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0s' }}>*</span>
                   </h2>
                 </div>
@@ -749,7 +765,7 @@ export default function App() {
             <div className="space-y-8 pt-8 border-t-4 border-dashed border-[#4A3E26] relative">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
-                  <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                  <h2 className="site-display-title text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
                     {siteContent.about.skillsHeading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.15s' }}>*</span>
                   </h2>
                   <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.skillsSubtitle}</p>
@@ -789,7 +805,7 @@ export default function App() {
             <div className="space-y-16 pt-8 border-t-4 border-dashed border-[#4A3E26] relative">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
-                  <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                  <h2 className="site-display-title text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
                     {siteContent.about.learningHeading} <span className="text-[#F3C556] font-normal">*</span>
                   </h2>
                   <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.learningSubtitle}</p>
@@ -822,7 +838,7 @@ export default function App() {
             <div className="space-y-8 pt-8 border-t-4 border-dashed border-[#4A3E26] relative">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                 <div>
-                  <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                  <h2 className="site-display-title text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
                     {siteContent.about.growthHeading} <span className="text-[#F3C556] font-normal animate-bounce-dot" style={{ animationDelay: '0.45s' }}>*</span>
                   </h2>
                   <p className="text-sm text-[#8E6D3B] tracking-wider mt-1 uppercase font-bold">{siteContent.about.growthSubtitle}</p>
@@ -865,7 +881,7 @@ export default function App() {
             
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-4 border-dashed border-[#4A3E26] pb-6">
               <div>
-                <h2 className="text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                <h2 className="site-display-title text-5xl md:text-6xl font-black text-[#3BB4FE] tracking-tight uppercase">
                   {siteContent.works.heading} <span className="text-[#F3C556] font-normal">*</span>
                 </h2>
                 <p className="text-sm md:text-base text-[#8E6D3B] tracking-wide mt-2 font-bold max-w-xl">
@@ -1195,7 +1211,7 @@ export default function App() {
 
             {/* BYE BUDDY Ending visual */}
             <div className="space-y-8 pt-12 border-t-4 border-dashed border-[#4A3E26] flex flex-col items-center justify-center text-center">
-              <h2 className="text-6xl md:text-7xl font-black text-[#3BB4FE] italic tracking-tight font-display">
+              <h2 className="site-display-title text-6xl md:text-7xl font-black text-[#3BB4FE] italic tracking-tight font-display">
                 {siteContent.works.closingHeading}
               </h2>
 
@@ -1238,7 +1254,7 @@ export default function App() {
             <div className="space-y-6">
               <div className="flex flex-col gap-2">
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-black text-[#3BB4FE] tracking-tight">
+                  <h2 className="site-display-title text-3xl md:text-4xl font-black text-[#3BB4FE] tracking-tight">
                     {siteContent.life.heading}
                   </h2>
                   <p className="text-xs text-[#8E6D3B] mt-1 font-medium opacity-70">
@@ -1387,7 +1403,7 @@ export default function App() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-[#3BB4FE] tracking-tight">
+                    <h2 className="site-display-title text-2xl md:text-3xl font-black text-[#3BB4FE] tracking-tight">
                       {siteContent.life.galleryHeading}
                     </h2>
                     <p className="text-xs text-[#8E6D3B] mt-1 font-medium">
@@ -1683,7 +1699,7 @@ export default function App() {
             {/* Section C: Sticky Guestbook (留言板) */}
             <div className="space-y-8 pt-8 border-t-4 border-dashed border-[#4A3E26]">
               <div>
-                <h2 className="text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
+                <h2 className="site-display-title text-4xl md:text-5xl font-black text-[#3BB4FE] tracking-tight uppercase">
                   {siteContent.life.guestbookHeading} <span className="text-[#F3C556] font-normal">✦</span>
                 </h2>
                 <p className="text-sm text-[#8E6D3B] tracking-wider font-bold uppercase mt-1">{siteContent.life.guestbookSubtitle}</p>
