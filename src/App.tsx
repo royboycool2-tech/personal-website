@@ -866,6 +866,7 @@ export default function App() {
                       color={learning.color}
                       status={learning.status}
                       nodes={learning.nodes}
+                      alwaysExpanded={learningItems.length === 1}
                     />
                   </div>
                 ))}
