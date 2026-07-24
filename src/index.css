@@ -188,9 +188,9 @@
   line-height: 1.6 !important;
 }
 
-/* About intro: main paragraphs are two pixels smaller than the +4 copy preset. */
+/* About intro: main paragraphs use the configured body size. */
 .site-typography .site-about-main-copy {
-  font-size: calc(var(--site-body-size, 16px) + 2px) !important;
+  font-size: var(--site-body-size, 16px) !important;
 }
 
 /* Closing sentences match the skill-title face and color without changing weight. */
@@ -287,7 +287,7 @@
   }
 
   .site-typography .site-about-main-copy {
-    font-size: calc(var(--site-mobile-body-size, 16px) + 2px) !important;
+    font-size: var(--site-mobile-body-size, 16px) !important;
   }
 
   .site-typography .learning-node-title {
