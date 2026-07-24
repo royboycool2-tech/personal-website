@@ -1,0 +1,59 @@
+[
+  {
+    "id": "life-1784717539812",
+    "title": "吃吃吃",
+    "content": "大小碗螺蛳粉，lxy说吃大碗螺蛳粉吃出了线面的感觉（越吃越多）",
+    "date": "2026.07.22",
+    "category": "diary",
+    "location": "深圳",
+    "mood": "🤭",
+    "weather": "⛅",
+    "tags": [
+      "美食"
+    ],
+    "images": [
+      "/uploads/life-1784717538375-802981132.jpg"
+    ],
+    "isPublic": true,
+    "createdAt": "2026-07-22T10:52:19.812Z",
+    "updatedAt": "2026-07-22T10:53:31.588Z"
+  },
+  {
+    "id": "life-1784715242656",
+    "title": "美甲💅",
+    "content": "第一次做美甲，感觉还不错~",
+    "date": "2026.07.10",
+    "category": "moment",
+    "location": "深圳",
+    "mood": "😄",
+    "weather": "☀️",
+    "tags": [
+      "日常"
+    ],
+    "images": [
+      "/uploads/life-1784715238192-816101296.jpg"
+    ],
+    "isPublic": true,
+    "createdAt": "2026-07-22T10:14:02.656Z",
+    "updatedAt": "2026-07-22T10:17:13.067Z"
+  },
+  {
+    "id": "life1",
+    "title": "夏天开始有了形状",
+    "content": "夏天见面，“圳”的幸运",
+    "date": "2026.7.19",
+    "category": "photo",
+    "location": "深圳",
+    "weather": "🌧️",
+    "tags": [
+      "演唱会"
+    ],
+    "images": [
+      "/uploads/life-1784715037654-754999767.jpg"
+    ],
+    "isPublic": true,
+    "createdAt": "2026-07-22T10:08:43.509Z",
+    "updatedAt": "2026-07-22T10:53:56.135Z",
+    "mood": "😄"
+  }
+]

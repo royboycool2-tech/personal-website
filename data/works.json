@@ -1,0 +1,42 @@
+[
+  {
+    "id": "work-1",
+    "number": "001",
+    "title": "售后二维码",
+    "englishTitle": "After-Sales QR Code",
+    "category": "业务实践 / 产品探索",
+    "projectType": "business",
+    "projectBadge": "真实业务衍生",
+    "defaultDesc": "基于多语言耳机售后内容，完成信息架构与Axure概念原型探索。",
+    "hoverDesc": "围绕6种语言、11类常见问题，梳理\"扫码—查找问题—阅读方案—联系售后\"的用户路径。",
+    "valueDesc": "让售后答案更容易被找到",
+    "problemDesc": "解决多语言售后内容分散、用户查找困难、客服压力大的问题",
+    "myRole": "负责信息架构设计、用户路径梳理、自发进行Axure原型制作训练",
+    "skills": [
+      "信息架构",
+      "用户路径",
+      "Axure",
+      "多语言设计",
+      "业务分析"
+    ],
+    "previewImage": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mobile%20phone%20QR%20code%20after-sales%20service%20app%20interface%20FAQ%20page%20clean%20design&image_size=square_hd",
+    "concept": "基于真实业务场景的售后二维码产品探索，让用户扫码就能快速找到答案。",
+    "story": "这是一个源于真实业务需求的探索项目。当时公司的多语言耳机售后内容分散在不同地方，用户查找困难，客服压力也很大。我主动承担起这个探索任务，围绕6种语言、11类常见问题，尝试梳理\"扫码—查找问题—阅读方案—联系售后\"的完整用户路径，并完成了信息架构设计和Axure概念原型。虽然最终没有正式上线，但这个探索过程让我深刻理解了\"从业务问题出发做产品\"的思考方式。",
+    "hasPrototype": true,
+    "prototypeUrl": "https://royboycool2-tech.github.io/Headphone-After-sales/",
+    "hasLiveProduct": false,
+    "liveUrl": "",
+    "hasCaseStudy": true,
+    "yearLabel": "EXPLORED IN 2026",
+    "bottomLabel": "PERSONAL EXPLORATION · AXURE",
+    "isPublic": true,
+    "sortOrder": 1,
+    "details": {
+      "dimensions": "Mobile Web",
+      "medium": "Axure RP + 用户研究",
+      "year": "2026"
+    },
+    "createdAt": "2026-07-23T05:17:57.047Z",
+    "updatedAt": "2026-07-24T10:12:51.185Z"
+  }
+]

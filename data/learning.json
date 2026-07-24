@@ -1,0 +1,35 @@
+[
+  {
+    "id": "learning-1",
+    "icon": "📚",
+    "iconBgColor": "#FF6B4A",
+    "title": "产品设计思维",
+    "description": "系统学习产品设计方法论，包括用户研究、需求分析、原型设计等核心能力。",
+    "progress": 65,
+    "sortOrder": 1,
+    "createdAt": "2026-07-24T04:11:00.753Z",
+    "updatedAt": "2026-07-24T04:11:00.754Z"
+  },
+  {
+    "id": "learning-2",
+    "icon": "🎨",
+    "iconBgColor": "#3BB4FE",
+    "title": "UI视觉设计",
+    "description": "提升Figma使用技能，学习色彩搭配、排版设计和组件化设计思维。",
+    "progress": 40,
+    "sortOrder": 2,
+    "createdAt": "2026-07-24T04:11:00.754Z",
+    "updatedAt": "2026-07-24T04:11:00.754Z"
+  },
+  {
+    "id": "learning-3",
+    "icon": "💻",
+    "iconBgColor": "#3BEA72",
+    "title": "前端开发基础",
+    "description": "学习HTML、CSS和JavaScript基础知识，了解React框架的核心概念。",
+    "progress": 25,
+    "sortOrder": 3,
+    "createdAt": "2026-07-24T04:11:00.754Z",
+    "updatedAt": "2026-07-24T04:11:00.754Z"
+  }
+]

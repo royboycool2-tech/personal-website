@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@500;700;800&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap');
+
+@import "tailwindcss";
+
+@layer utilities {
+  .font-handwriting {
+    font-family: 'Caveat', 'Ma Shan Zheng', cursive;
+  }
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'ZCOOL KuaiLe', sans-serif;
+  }
+}
+
+/* Custom styles for polaroid tilt and animations */
+.polaroid-tilt-left {
+  transform: rotate(-3deg);
+  transition: transform 0.3s ease;
+}
+.polaroid-tilt-left:hover {
+  transform: rotate(-1deg) scale(1.03);
+}
+
+.polaroid-tilt-right {
+  transform: rotate(4deg);
+  transition: transform 0.3s ease;
+}
+.polaroid-tilt-right:hover {
+  transform: rotate(2deg) scale(1.03);
+}
+
+.sticky-note-tilt {
+  transform: rotate(2deg);
+  transition: transform 0.2s ease;
+}
+.sticky-note-tilt:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.95; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+@keyframes bounce-dot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
