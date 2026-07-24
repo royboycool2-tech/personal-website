@@ -191,6 +191,13 @@ interface SiteContent {
     guestbookSubtitle: string;
     guestbookTag: string;
   };
+  typography: {
+    displayWeight: number;
+    headingWeight: number;
+    bodyWeight: number;
+    helperWeight: number;
+    mobileAutoLighten: boolean;
+  };
   footer: {
     heading: string;
     slogan: string;
@@ -661,6 +668,13 @@ let siteContent: SiteContent = {
     guestbookSubtitle: 'Leave a sweet note on the digital corkboard',
     guestbookTag: '#四金的时光小屋',
   },
+  typography: {
+    displayWeight: 900,
+    headingWeight: 800,
+    bodyWeight: 500,
+    helperWeight: 700,
+    mobileAutoLighten: true,
+  },
   footer: {
     heading: "Let's build something\nextraordinary together.",
     slogan: '一定会成为一个很棒的大人！',
@@ -753,6 +767,7 @@ async function loadState(): Promise<void> {
       about: { ...siteContentFallback.about, ...storedSiteContent.about },
       works: { ...siteContentFallback.works, ...storedSiteContent.works },
       life: { ...siteContentFallback.life, ...storedSiteContent.life },
+      typography: { ...siteContentFallback.typography, ...storedSiteContent.typography },
       footer: { ...siteContentFallback.footer, ...storedSiteContent.footer },
     };
   } else {
@@ -862,6 +877,17 @@ const handleRequest = async (req: VercelRequest, res: VercelResponse) => {
           : siteContent.works.closingParagraphs,
       },
       life: { ...siteContent.life, ...(incoming.life || {}) },
+      typography: {
+        ...siteContent.typography,
+        ...(incoming.typography || {}),
+        displayWeight: Math.min(900, Math.max(100, Number(incoming.typography?.displayWeight ?? siteContent.typography.displayWeight))),
+        headingWeight: Math.min(900, Math.max(100, Number(incoming.typography?.headingWeight ?? siteContent.typography.headingWeight))),
+        bodyWeight: Math.min(900, Math.max(100, Number(incoming.typography?.bodyWeight ?? siteContent.typography.bodyWeight))),
+        helperWeight: Math.min(900, Math.max(100, Number(incoming.typography?.helperWeight ?? siteContent.typography.helperWeight))),
+        mobileAutoLighten: incoming.typography?.mobileAutoLighten !== undefined
+          ? Boolean(incoming.typography.mobileAutoLighten)
+          : siteContent.typography.mobileAutoLighten,
+      },
       footer: { ...siteContent.footer, ...(incoming.footer || {}) },
     };
     await redis.set(STORAGE_KEYS.siteContent, siteContent);
