@@ -189,12 +189,12 @@
 }
 
 /* About intro: main paragraphs use the configured body size. */
-.site-typography .site-about-main-copy {
-  font-size: calc(var(--site-body-size, 16px) - 2px) !important;
+.site-typography .site-red-copy p.site-about-main-copy {
+  font-size: calc(var(--site-body-size, 16px) + 1px) !important;
 }
 
 /* Closing sentences match the skill-title face and color without changing weight. */
-.site-typography .site-about-closing-copy {
+.site-typography .site-red-copy p.site-about-closing-copy {
   color: #4A3E26 !important;
   font-family: 'Plus Jakarta Sans', 'ZCOOL KuaiLe', sans-serif !important;
   font-size: calc(var(--site-body-size, 16px) + 6px) !important;
@@ -287,11 +287,11 @@
     font-size: calc(var(--site-mobile-helper-size, 13px) + 4px) !important;
   }
 
-  .site-typography .site-about-main-copy {
-    font-size: calc(var(--site-mobile-body-size, 16px) - 2px) !important;
+  .site-typography .site-red-copy p.site-about-main-copy {
+    font-size: calc(var(--site-mobile-body-size, 16px) + 1px) !important;
   }
 
-  .site-typography .site-about-closing-copy {
+  .site-typography .site-red-copy p.site-about-closing-copy {
     font-size: calc(var(--site-mobile-body-size, 16px) + 6px) !important;
   }
 
