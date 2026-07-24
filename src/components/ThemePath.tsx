@@ -55,7 +55,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
 
   if (isMobile) {
     return (
-      <div ref={sectionRef} className="site-dynamic-card relative rounded-3xl border-4 border-[#37332B] bg-[#FFFDE5] p-6">
+      <div ref={sectionRef} className="site-dynamic-card site-copy-font site-red-copy relative rounded-3xl border-4 border-[#37332B] bg-[#FFFDE5] p-6">
         <div className="flex flex-wrap items-baseline gap-3 mb-6">
           <span className="text-sm font-black tracking-wider" style={{ color }}>
             {String(id).padStart(2, '0')}
@@ -132,7 +132,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
   }
 
   return (
-    <div ref={sectionRef} className="site-dynamic-card relative rounded-3xl border-4 border-[#37332B] bg-[#FFFDE5] p-6 md:p-8 h-full">
+    <div ref={sectionRef} className="site-dynamic-card site-copy-font site-red-copy relative rounded-3xl border-4 border-[#37332B] bg-[#FFFDE5] p-6 md:p-8 h-full">
       <div className="flex flex-wrap items-baseline gap-3 mb-6">
         <span className="text-sm md:text-base font-black tracking-wider" style={{ color }}>
           {String(id).padStart(2, '0')}
