@@ -82,47 +82,58 @@
   font-weight: var(--site-body-weight, 500);
 }
 
+.site-typography .site-page {
+  font-size: var(--site-body-size, 16px) !important;
+  font-weight: var(--site-body-weight, 500);
+}
+
 .site-typography .site-hero-title {
-  font-size: var(--site-hero-size, 72px);
-  font-weight: var(--site-display-weight, 900);
+  font-size: var(--site-hero-size, 72px) !important;
+  font-weight: var(--site-display-weight, 900) !important;
 }
 
 .site-typography .font-black {
-  font-weight: var(--site-heading-weight, 800);
+  font-weight: var(--site-heading-weight, 800) !important;
 }
 
 .site-typography .font-bold,
 .site-typography .font-semibold {
-  font-weight: var(--site-helper-weight, 700);
+  font-weight: var(--site-helper-weight, 700) !important;
 }
 
 .site-typography .font-medium,
 .site-typography .font-normal {
-  font-weight: var(--site-body-weight, 500);
+  font-weight: var(--site-body-weight, 500) !important;
 }
 
 .site-typography .site-display-title {
-  font-size: var(--site-display-size, 42px);
-  font-weight: var(--site-display-weight, 900);
+  font-size: var(--site-display-size, 42px) !important;
+  font-weight: var(--site-display-weight, 900) !important;
 }
 
-.site-typography h2:not(.site-display-title),
-.site-typography h3,
-.site-typography h4 {
-  font-size: var(--site-heading-size, 22px);
+.site-typography .site-page h2:not(.site-display-title),
+.site-typography .site-page h3,
+.site-typography .site-page h4,
+.site-typography .site-dynamic-card h3,
+.site-typography .site-dynamic-card h4 {
+  font-size: var(--site-heading-size, 22px) !important;
+  font-weight: var(--site-heading-weight, 800) !important;
 }
 
-.site-typography .text-sm,
-.site-typography .text-base {
-  font-size: var(--site-body-size, 16px);
-  line-height: 1.7;
+.site-typography .site-page .text-sm:not(h1):not(h2):not(h3):not(h4),
+.site-typography .site-page .text-base:not(h1):not(h2):not(h3):not(h4),
+.site-typography .site-page .text-lg:not(h1):not(h2):not(h3):not(h4),
+.site-typography .site-dynamic-card p {
+  font-size: var(--site-body-size, 16px) !important;
+  line-height: 1.7 !important;
 }
 
-.site-typography .text-xs,
-.site-typography [class*="text-[10px]"],
-.site-typography [class*="text-[9px]"] {
-  font-size: var(--site-helper-size, 13px);
-  line-height: 1.5;
+.site-typography .site-page .text-xs,
+.site-typography .site-page [class*="text-[10px]"],
+.site-typography .site-page [class*="text-[9px]"],
+.site-typography .site-dynamic-card .text-xs {
+  font-size: var(--site-helper-size, 13px) !important;
+  line-height: 1.5 !important;
 }
 
 @media (max-width: 640px) {
@@ -131,44 +142,55 @@
     font-weight: var(--site-mobile-body-weight, 400);
   }
 
+  .site-typography .site-page {
+    font-size: var(--site-mobile-body-size, 16px) !important;
+    font-weight: var(--site-mobile-body-weight, 400);
+  }
+
   .site-typography .site-hero-title {
-    font-size: var(--site-mobile-hero-size, 52px);
-    font-weight: var(--site-mobile-display-weight, 800);
+    font-size: var(--site-mobile-hero-size, 52px) !important;
+    font-weight: var(--site-mobile-display-weight, 800) !important;
   }
 
   .site-typography .font-black {
-    font-weight: var(--site-mobile-heading-weight, 700);
+    font-weight: var(--site-mobile-heading-weight, 700) !important;
   }
 
   .site-typography .font-bold,
   .site-typography .font-semibold {
-    font-weight: var(--site-mobile-helper-weight, 600);
+    font-weight: var(--site-mobile-helper-weight, 600) !important;
   }
 
   .site-typography .font-medium,
   .site-typography .font-normal {
-    font-weight: var(--site-mobile-body-weight, 400);
+    font-weight: var(--site-mobile-body-weight, 400) !important;
   }
 
   .site-typography .site-display-title {
-    font-size: var(--site-mobile-display-size, 34px);
-    font-weight: var(--site-mobile-display-weight, 800);
+    font-size: var(--site-mobile-display-size, 34px) !important;
+    font-weight: var(--site-mobile-display-weight, 800) !important;
   }
 
-  .site-typography h2:not(.site-display-title),
-  .site-typography h3,
-  .site-typography h4 {
-    font-size: var(--site-mobile-heading-size, 20px);
+  .site-typography .site-page h2:not(.site-display-title),
+  .site-typography .site-page h3,
+  .site-typography .site-page h4,
+  .site-typography .site-dynamic-card h3,
+  .site-typography .site-dynamic-card h4 {
+    font-size: var(--site-mobile-heading-size, 20px) !important;
+    font-weight: var(--site-mobile-heading-weight, 700) !important;
   }
 
-  .site-typography .text-sm,
-  .site-typography .text-base {
-    font-size: var(--site-mobile-body-size, 16px);
+  .site-typography .site-page .text-sm:not(h1):not(h2):not(h3):not(h4),
+  .site-typography .site-page .text-base:not(h1):not(h2):not(h3):not(h4),
+  .site-typography .site-page .text-lg:not(h1):not(h2):not(h3):not(h4),
+  .site-typography .site-dynamic-card p {
+    font-size: var(--site-mobile-body-size, 16px) !important;
   }
 
-  .site-typography .text-xs,
-  .site-typography [class*="text-[10px]"],
-  .site-typography [class*="text-[9px]"] {
-    font-size: var(--site-mobile-helper-size, 13px);
+  .site-typography .site-page .text-xs,
+  .site-typography .site-page [class*="text-[10px]"],
+  .site-typography .site-page [class*="text-[9px]"],
+  .site-typography .site-dynamic-card .text-xs {
+    font-size: var(--site-mobile-helper-size, 13px) !important;
   }
 }
