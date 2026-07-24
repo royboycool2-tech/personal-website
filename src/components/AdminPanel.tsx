@@ -1413,7 +1413,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       }}
                       className="bg-white border-2 border-[#4A3E26] px-3 py-2 rounded-xl text-xs font-black shadow-[2px_2px_0_0_#4A3E26]"
                     >
-                      恢复推荐值
+                      应用参考图推荐值
                     </button>
                   </div>
                   <div className="space-y-3">
@@ -1422,8 +1422,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       <p className="text-xs font-bold text-[#8E6D3B] mt-1">数值越大，文字占用空间越大；不会改变文字粗细。</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                      <SizeSelect label="首页 Hey,buddy 大标题字号" value={siteContent.typography.heroSize} min={32} max={120} onChange={value => updateContentField('typography', 'heroSize', value)} />
-                      <SizeSelect label="页面大标题字号" value={siteContent.typography.displaySize} min={24} max={72} onChange={value => updateContentField('typography', 'displaySize', value)} />
+                      <SizeSelect label="首页 Hey,buddy 大标题字号" value={siteContent.typography.heroSize} min={32} max={160} onChange={value => updateContentField('typography', 'heroSize', value)} />
+                      <SizeSelect label="页面大标题字号" value={siteContent.typography.displaySize} min={24} max={120} onChange={value => updateContentField('typography', 'displaySize', value)} />
                       <SizeSelect label="普通标题 / 卡片标题字号" value={siteContent.typography.headingSize} min={16} max={40} onChange={value => updateContentField('typography', 'headingSize', value)} />
                       <SizeSelect label="正文字号" value={siteContent.typography.bodySize} min={14} max={24} onChange={value => updateContentField('typography', 'bodySize', value)} />
                       <SizeSelect label="副标题 / 辅助文字字号" value={siteContent.typography.helperSize} min={11} max={20} onChange={value => updateContentField('typography', 'helperSize', value)} />
