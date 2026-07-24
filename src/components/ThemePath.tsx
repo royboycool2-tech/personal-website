@@ -72,7 +72,7 @@ export default function ThemePath({ id, title, description, color, status = DEFA
 
         <div className="relative pl-6 space-y-4">
           {nodes.map((node, index) => {
-            const isActive = alwaysExpanded || hoveredNode === node.id;
+            const isActive = hoveredNode === node.id;
 
             return (
               <div key={node.id} className="relative">
@@ -86,11 +86,11 @@ export default function ThemePath({ id, title, description, color, status = DEFA
                 )}
 
                 <div 
-                  className={`ml-8 py-2 ${alwaysExpanded ? 'cursor-default' : 'cursor-pointer'}`}
-                  onMouseEnter={() => !alwaysExpanded && setHoveredNode(node.id)}
-                  onMouseLeave={() => !alwaysExpanded && setHoveredNode(null)}
-                  onClick={() => !alwaysExpanded && setHoveredNode(isActive ? null : node.id)}
-                  tabIndex={alwaysExpanded ? -1 : 0}
+                  className="ml-8 py-2 cursor-pointer"
+                  onMouseEnter={() => setHoveredNode(node.id)}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setHoveredNode(isActive ? null : node.id)}
+                  tabIndex={0}
                 >
                   <div className="flex flex-col gap-1">
                     <h4 className="learning-node-title font-black text-[#28251F]">{node.title}</h4>
@@ -177,21 +177,25 @@ export default function ThemePath({ id, title, description, color, status = DEFA
                   }}
                 />
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="learning-node-title text-lg font-black text-[#28251F]">
-                      {node.title}
-                    </h4>
-                    <div className="w-6 h-px bg-[#37332B]/30 flex-shrink-0" />
-                  </div>
+                <div className={`flex-1 ${alwaysExpanded ? 'grid grid-cols-[minmax(220px,0.8fr)_minmax(0,1.7fr)] gap-6 items-start' : ''}`}>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="learning-node-title text-lg font-black text-[#28251F]">
+                        {node.title}
+                      </h4>
+                      <div className="w-6 h-px bg-[#37332B]/30 flex-shrink-0" />
+                    </div>
 
-                  <span className="text-sm font-mono mt-1 block" style={{ color }}>
-                    {node.tool}
-                  </span>
+                    <span className="text-sm font-mono mt-1 block" style={{ color }}>
+                      {node.tool}
+                    </span>
+                  </div>
 
                   {isActive && (node.description || node.tags || node.link) && (
                     <div 
-                      className="mt-3 pt-3 border-t border-dashed border-[#37332B]/20 space-y-2"
+                      className={alwaysExpanded
+                        ? 'pl-6 border-l border-dashed border-[#37332B]/20 space-y-2'
+                        : 'mt-3 pt-3 border-t border-dashed border-[#37332B]/20 space-y-2'}
                     >
                       {node.description && (
                         <p className="text-sm text-[#706A5E] leading-relaxed">
