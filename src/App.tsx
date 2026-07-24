@@ -385,6 +385,16 @@ export default function App() {
 
   const mobileWeightReduction = siteContent.typography.mobileAutoLighten ? 100 : 0;
   const typographyVariables = {
+    '--site-hero-size': `${siteContent.typography.heroSize}px`,
+    '--site-display-size': `${siteContent.typography.displaySize}px`,
+    '--site-heading-size': `${siteContent.typography.headingSize}px`,
+    '--site-body-size': `${siteContent.typography.bodySize}px`,
+    '--site-helper-size': `${siteContent.typography.helperSize}px`,
+    '--site-mobile-hero-size': `${Math.max(40, Math.round(siteContent.typography.heroSize * 0.72))}px`,
+    '--site-mobile-display-size': `${Math.max(28, Math.round(siteContent.typography.displaySize * 0.8))}px`,
+    '--site-mobile-heading-size': `${Math.max(18, Math.round(siteContent.typography.headingSize * 0.9))}px`,
+    '--site-mobile-body-size': `${siteContent.typography.bodySize}px`,
+    '--site-mobile-helper-size': `${siteContent.typography.helperSize}px`,
     '--site-display-weight': siteContent.typography.displayWeight,
     '--site-heading-weight': siteContent.typography.headingWeight,
     '--site-body-weight': siteContent.typography.bodyWeight,
@@ -516,7 +526,7 @@ export default function App() {
           <div id="home_tab_view" className="space-y-12 animate-fadeIn">
             {/* Display Big Bold Heading - Hey,buddy! */}
             <div className="relative text-center py-4">
-              <h1 className="site-display-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
+              <h1 className="site-hero-title text-7xl sm:text-8xl md:text-9xl font-black text-[#3BB4FE] italic tracking-tight font-display select-none leading-none">
                 {siteContent.home.heroTitle}
               </h1>
               {/* Spiky Blue badge overlay */}
